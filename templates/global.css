@@ -1,0 +1,99 @@
+/* apply a natural box layout model to all elements, but allowing components to change */
+html {
+	box-sizing: border-box;
+}
+
+*, *:before, *:after {
+	box-sizing: inherit;
+}
+
+*, *:before, *:after {
+	margin:0;
+	padding:0;
+}
+
+body {
+	font-family:sans-serif;
+	background-color:#111;
+	color:#EEE;
+}
+
+a {
+	color:#DDD;
+}
+
+p {
+	margin: 1.12em 0;
+}
+
+/* Clearfix */
+.cf:before,
+.cf:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.cf:after {
+    clear: both;
+}
+
+.cf {
+    *zoom: 1;
+}
+
+.notes {
+	position:absolute;
+	width:200px;
+	top:12px;
+	left:12px;
+	background-color:#F0E080;
+	padding:0 12px;
+	color:#111;
+}
+
+.wrapper {
+	margin:0 auto;
+	max-width:760px;
+}
+
+.header {
+	padding:12px 0;
+}
+
+.title {
+	float:left;
+}
+
+.nav.nav-header {
+	float:right;
+}
+
+.nav ul {
+	list-style:none;
+}
+
+.nav ul li {
+	display:block;
+	float:left;
+}
+
+.nav ul li a {
+	display:inline-block;
+	padding:5px 10px;
+	border:1px solid #FFF;
+}
+
+.works {
+	padding:12px 0;
+	display:flex;
+	flex-direction:row;
+	flex-wrap:wrap;
+	justify-content:center;
+}
+
+.work {
+	width:240px;
+	height:240px;
+	margin:auto;
+	border:1px solid #FFF;
+}
