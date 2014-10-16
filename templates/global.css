@@ -13,13 +13,35 @@ html {
 }
 
 body {
-	font-family:sans-serif;
+	font-family:Helvetica, Arial, sans-serif;
 	background-color:#111;
+	background-image:url(img/background-1.jpg);
+	background-repeat:no-repeat;
+	background-position:center center;
+	background-size:200%;
 	color:#EEE;
+	background-attachment:fixed;
+	font-size:62.5%;
+}
+
+body:after {
+	content:'';
+	position:fixed;
+	display:block;
+	background:rgba(0,0,0,0.85);
+	width:100%;
+	height:100%;
+	top:0;
+	left:0;
 }
 
 a {
 	color:#DDD;
+	text-decoration:none;
+}
+
+a:hover, a.active {
+	text-decoration:underline;
 }
 
 p {
@@ -53,15 +75,22 @@ p {
 
 .wrapper {
 	margin:0 auto;
-	max-width:760px;
+	max-width:960px;
+	position:relative;
+	z-index:1;
 }
 
 .header {
 	padding:12px 0;
+	margin:0 0 12px 0;
+	border-bottom:1px solid rgba(255, 255, 255, 0.15);
 }
 
 .title {
 	float:left;
+	font-family:'Just Me Again Down Here', cursive;
+	font-weight:normal;
+	font-size:250%;
 }
 
 .nav.nav-header {
@@ -80,7 +109,7 @@ p {
 .nav ul li a {
 	display:inline-block;
 	padding:5px 10px;
-	border:1px solid #FFF;
+	text-transform:lowercase;
 }
 
 .works {
@@ -92,8 +121,34 @@ p {
 }
 
 .work {
-	width:240px;
-	height:240px;
+	width:235px;
+	height:235px;
 	margin:auto;
-	border:1px solid #FFF;
+	overflow:hidden;
+	background-repeat:no-repeat;
+	background-size:cover;
+	background-position:center center;
+	-webkit-transition: opacity 0.25s ease-out;
+	-moz-transition: opacity 0.25s ease-out;
+	-ms-transition: opacity 0.25s ease-out;
+	-o-transition: opacity 0.25s ease-out;
+	transition: opacity 0.25s ease-out;
+}
+
+.work a {
+	display:block;
+	height:100%;
+	width:100%;
+}
+
+.works:hover .work {
+	opacity:0.5;
+}
+
+.works:hover .work:hover {
+	opacity:1;
+}
+
+.work img {
+	visibility:hidden;
 }
