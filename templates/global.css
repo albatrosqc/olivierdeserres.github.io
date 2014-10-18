@@ -71,6 +71,7 @@ p {
 	background-color:#F0E080;
 	padding:0 12px;
 	color:#111;
+	display:none;
 }
 
 .wrapper {
@@ -91,6 +92,10 @@ p {
 	font-family:'Just Me Again Down Here', cursive;
 	font-weight:normal;
 	font-size:250%;
+}
+
+.title a {
+	text-decoration:none;
 }
 
 .nav.nav-header {
@@ -121,9 +126,9 @@ p {
 }
 
 .work {
+	flex-grow:1;
 	width:235px;
 	height:235px;
-	margin:auto;
 	overflow:hidden;
 	background-repeat:no-repeat;
 	background-size:cover;
