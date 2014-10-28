@@ -225,10 +225,25 @@ p {
 	font-family: 'Armata', sans-serif;
 	padding:6px;
 	font-size:11px;
-	width:250px;
+	width:400px;
 }
 
 .input-large {
 	width:400px;
 	height:100px;
+}
+
+.btn {
+	font-family: 'Armata', sans-serif;
+	padding:7px 6px 6px 6px;
+	font-size:11px;
+	background:#ECECEC;
+	border:none;
+	
+	cursor:pointer;
+}
+
+.form-actions {
+	text-align:right;
+	width:500px;
 }
