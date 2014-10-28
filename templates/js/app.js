@@ -8,6 +8,10 @@ var pckry = new Packery($container, {
   transitionDuration:'0s'
 });
 
+imagesLoaded($container, function(ev) {
+	pckry.layout();
+});
+
 $works.find('a[rel=work]').fancybox({
 	scrolling:'no',
 	arrows:true
