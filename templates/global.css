@@ -12,6 +12,11 @@ html {
 	padding:0;
 }
 
+html {
+     overflow: -moz-scrollbars-vertical;
+     overflow-y: scroll;
+}
+
 body {
 	font-family:Helvetica, Arial, sans-serif;
 	background-color:#111;
@@ -22,17 +27,24 @@ body {
 	color:#EEE;
 	background-attachment:fixed;
 	font-size:67.5%;
+	padding:0 12px;
 }
 
 body:after {
 	content:'';
 	position:fixed;
 	display:block;
-	background:rgba(0,0,0,0.85);
 	width:100%;
 	height:100%;
 	top:0;
 	left:0;
+background: -moz-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.25) 1%, rgba(0,0,0,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(0,0,0,0.25)), color-stop(1%,rgba(0,0,0,0.25)), color-stop(100%,rgba(0,0,0,1))); /* Chrome,Safari4+ */
+background: -webkit-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.25) 1%,rgba(0,0,0,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.25) 1%,rgba(0,0,0,1) 100%); /* Opera 12+ */
+background: -ms-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.25) 1%,rgba(0,0,0,1) 100%); /* IE10+ */
+background: radial-gradient(ellipse at center,  rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.25) 1%,rgba(0,0,0,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#40000000', endColorstr='#000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
 
 a {
@@ -100,6 +112,8 @@ p {
 
 .nav.nav-header {
 	float:right;
+	height:100%;
+	padding:10px 0 0 0;
 }
 
 .nav ul {
@@ -116,14 +130,11 @@ p {
 	padding:5px 10px;
 	text-transform:lowercase;
 }
-
 .works {
 	padding:12px 0;
-	display:flex;
-	flex-direction:row;
-	flex-wrap:wrap;
-	justify-content:center;
 }
+
+/*
 
 .work {
 	flex-grow:1;
@@ -139,6 +150,22 @@ p {
 	-o-transition: opacity 0.25s ease-out;
 	transition: opacity 0.25s ease-out;
 }
+*/
+
+.gutter-sizer {
+	width:1%;
+}
+
+.work {
+	width:19%;
+	height:auto;
+	
+	-webkit-transition: opacity 0.25s ease-out;
+	-moz-transition: opacity 0.25s ease-out;
+	-ms-transition: opacity 0.25s ease-out;
+	-o-transition: opacity 0.25s ease-out;
+	transition: opacity 0.25s ease-out;
+}
 
 .work a {
 	display:block;
@@ -147,7 +174,7 @@ p {
 }
 
 .works:hover .work {
-	opacity:0.5;
+	opacity:0.25;
 }
 
 .works:hover .work:hover {
@@ -155,5 +182,6 @@ p {
 }
 
 .work img {
-	visibility:hidden;
+	width:100%;
+	height:auto;
 }
