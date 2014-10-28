@@ -3,11 +3,32 @@
 	<head>
 		<meta charset="utf-8">
 		
-		<title>Olivier de Serres</title>
+		<title>Olivier De Serres</title>
 		
-		<link href='http://fonts.googleapis.com/css?family=Just+Me+Again+Down+Here' rel='stylesheet' type='text/css'>
-		<link href="css/jquery.fancybox.css" media="all" rel="stylesheet" type="text/css" />
-		<link href="css/global.css" media="all" rel="stylesheet" type="text/css" />
+		<meta name="description" content="J'aime peindre.">
+		
+		<!-- Facebook share -->
+		<meta property="og:url" content="http://www.olivierdeserres.com"/>
+		<meta property="og:title" content="Olivier De Serres"/>
+		<meta property="og:description" content="J'aime peindre."/>
+		<meta property="og:image" content="http://www.olivierdeserres.com/templates/img/share.png"/>
+		
+		<!-- Twitter share -->
+		<meta name="twitter:card" content="summary_large_image">
+		<meta name="twitter:title" content="Olivier De Serres">
+		<meta name="twitter:description" content="J'aime peindre.">
+		<meta name="twitter:image:src" content="http://www.olivierdeserres.com/templates/img/share.png">
+		<meta name="twitter:domain" content="www.olivierdeserres.com">
+		
+		<!-- Mobile configuration -->
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-title" content="Olivier De Serres">
+		
+		<!-- Stylesheet -->
+		<link href="http://fonts.googleapis.com/css?family=Oswald:400,300|Armata" rel="stylesheet" type="text/css">
+		<link href="css/jquery.fancybox.css" media="all" rel="stylesheet" type="text/css">
+		<link href="css/global.css" media="all" rel="stylesheet" type="text/css">
 	</head>
 	<body>
 		<div class="notes">
@@ -19,7 +40,7 @@
 		
 		<div class="wrapper">
 			<header class="header cf">
-				<h1 class="title"><a href="index.html">Olivier de Serres</a></h1>
+				<h1 class="title"><a href="index.html">Olivier<span> </span><em>De<span> </span>Serres</em></a></h1>
 				
 				<nav class="nav nav-header">
 					<ul class="cf">
@@ -43,13 +64,16 @@
 							<a href="#" class="active">Tous</a>
 						</li>
 						<li>
-							<a href="#dessins">Dessins</a>
-						</li>
-						<li>
 							<a href="#peintures">Peintures</a>
 						</li>
 						<li>
-							<a href="#videos">Vidéos</a>
+							<a href="#dessins">Dessins</a>
+						</li>
+						<li>
+							<a href="#graffitis">Graffitis</a>
+						</li>
+						<li>
+							<a href="#whatever">whatever</a>
 						</li>
 					</ul>
 				</nav>
@@ -57,128 +81,150 @@
 				<div class="works">
 					<div class="gutter-sizer"></div>
 					
-					<div class="work">
+					<div data-category="dessins" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_mztnd1orCJ1sfinydo2_500.jpg">
 							<img src="img/works/tumblr_mztnd1orCJ1sfinydo2_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="dessins" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n1dahn8NNi1sfinydo1_500.jpg">
 							<img src="img/works/tumblr_n1dahn8NNi1sfinydo1_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="dessins" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n1dajtrZ9N1sfinydo1_500.jpg">
 							<img src="img/works/tumblr_n1dajtrZ9N1sfinydo1_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="dessins" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n1dajtrZ9N1sfinydo2_500.jpg">
 							<img src="img/works/tumblr_n1dajtrZ9N1sfinydo2_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="dessins" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n2p5j6ik6s1sfinydo1_500.jpg">
 							<img src="img/works/tumblr_n2p5j6ik6s1sfinydo1_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="peintures" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n2p5j6ik6s1sfinydo2_500.jpg">
 							<img src="img/works/tumblr_n2p5j6ik6s1sfinydo2_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="peintures" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n4efjm0hGd1sfinydo5_500.jpg">
 							<img src="img/works/tumblr_n4efjm0hGd1sfinydo5_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="peintures" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n4yjgnPNRk1sfinydo1_500.jpg">
 							<img src="img/works/tumblr_n4yjgnPNRk1sfinydo1_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="peintures" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n4yjgnPNRk1sfinydo4_500.jpg">
 							<img src="img/works/tumblr_n4yjgnPNRk1sfinydo4_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="peintures" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n4yjgnPNRk1sfinydo3_500.jpg">
 							<img src="img/works/tumblr_n4yjgnPNRk1sfinydo3_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="graffitis" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n4yjgnPNRk1sfinydo2_500.jpg">
 							<img src="img/works/tumblr_n4yjgnPNRk1sfinydo2_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="graffitis" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n5qdqrkSqw1sfinydo4_500.jpg">
 							<img src="img/works/tumblr_n5qdqrkSqw1sfinydo4_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="graffitis" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_mztnd1orCJ1sfinydo2_500.jpg">
 							<img src="img/works/tumblr_mztnd1orCJ1sfinydo2_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="graffitis" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n1dahn8NNi1sfinydo1_500.jpg">
 							<img src="img/works/tumblr_n1dahn8NNi1sfinydo1_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="graffitis" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n1dajtrZ9N1sfinydo1_500.jpg">
 							<img src="img/works/tumblr_n1dajtrZ9N1sfinydo1_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="graffitis" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n1dajtrZ9N1sfinydo2_500.jpg">
 							<img src="img/works/tumblr_n1dajtrZ9N1sfinydo2_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="whatever" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n2p5j6ik6s1sfinydo1_500.jpg">
 							<img src="img/works/tumblr_n2p5j6ik6s1sfinydo1_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="whatever" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n2p5j6ik6s1sfinydo2_500.jpg">
 							<img src="img/works/tumblr_n2p5j6ik6s1sfinydo2_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="whatever" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n4efjm0hGd1sfinydo5_500.jpg">
 							<img src="img/works/tumblr_n4efjm0hGd1sfinydo5_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="whatever" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n4yjgnPNRk1sfinydo1_500.jpg">
 							<img src="img/works/tumblr_n4yjgnPNRk1sfinydo1_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="whatever" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n4yjgnPNRk1sfinydo4_500.jpg">
 							<img src="img/works/tumblr_n4yjgnPNRk1sfinydo4_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="whatever" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n4yjgnPNRk1sfinydo3_500.jpg">
 							<img src="img/works/tumblr_n4yjgnPNRk1sfinydo3_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="whatever" class="work">
 						<a rel="work" title="Description de la piece" href="img/works/tumblr_n4yjgnPNRk1sfinydo2_500.jpg">
 							<img src="img/works/tumblr_n4yjgnPNRk1sfinydo2_500.jpg" />
 						</a>
 					</div>
-					<div class="work">
+					
+					<div data-category="whatever" class="work">
 						<a rel="work" title="Description de la piece" title="Description de la piece" href="img/works/tumblr_n5qdqrkSqw1sfinydo4_500.jpg">
 							<img src="img/works/tumblr_n5qdqrkSqw1sfinydo4_500.jpg" />
 						</a>
 					</div>
 				</div>
-				
 			</div>
 		</div>
 		

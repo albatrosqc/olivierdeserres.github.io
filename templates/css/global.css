@@ -18,15 +18,15 @@ html {
 }
 
 body {
-	font-family:Helvetica, Arial, sans-serif;
+	font-family: 'Armata', sans-serif;
 	background-color:#111;
-	background-image:url(img/background-1.jpg);
+	background-image:url(../img/background-1.jpg);
 	background-repeat:no-repeat;
 	background-position:center center;
+	background-attachment:fixed;
 	background-size:200%;
 	color:#EEE;
-	background-attachment:fixed;
-	font-size:67.5%;
+	font-size:62.5%;
 	padding:0 12px;
 }
 
@@ -38,13 +38,14 @@ body:after {
 	height:100%;
 	top:0;
 	left:0;
-background: -moz-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.25) 1%, rgba(0,0,0,1) 100%); /* FF3.6+ */
-background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(0,0,0,0.25)), color-stop(1%,rgba(0,0,0,0.25)), color-stop(100%,rgba(0,0,0,1))); /* Chrome,Safari4+ */
-background: -webkit-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.25) 1%,rgba(0,0,0,1) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.25) 1%,rgba(0,0,0,1) 100%); /* Opera 12+ */
-background: -ms-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.25) 1%,rgba(0,0,0,1) 100%); /* IE10+ */
-background: radial-gradient(ellipse at center,  rgba(0,0,0,0.25) 0%,rgba(0,0,0,0.25) 1%,rgba(0,0,0,1) 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#40000000', endColorstr='#000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+	
+background: -moz-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.5) 0%, rgba(0,0,0,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(0,0,0,0.5)), color-stop(100%,rgba(0,0,0,1))); /* Chrome,Safari4+ */
+background: -webkit-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.5) 0%,rgba(0,0,0,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.5) 0%,rgba(0,0,0,1) 100%); /* Opera 12+ */
+background: -ms-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.5) 0%,rgba(0,0,0,1) 100%); /* IE10+ */
+background: radial-gradient(ellipse at center,  rgba(0,0,0,0.5) 0%,rgba(0,0,0,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#80000000', endColorstr='#000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
 
 a {
@@ -101,13 +102,34 @@ p {
 
 .title {
 	float:left;
-	font-family:'Just Me Again Down Here', cursive;
-	font-weight:normal;
 	font-size:250%;
+	font-family: 'Oswald', sans-serif;
+	font-weight:400;
+	text-transform:uppercase;
+}
+
+.title span {
+	display:none;
+}
+
+.title em {
+	opacity:0.8;
+	font-style:normal;
+	
 }
 
 .title a {
 	text-decoration:none;
+	
+	-webkit-transition: opacity 0.25s ease-out;
+	-moz-transition: opacity 0.25s ease-out;
+	-ms-transition: opacity 0.25s ease-out;
+	-o-transition: opacity 0.25s ease-out;
+	transition: opacity 0.25s ease-out;
+}
+
+.title a:hover {
+	opacity:0.8;
 }
 
 .nav.nav-header {
@@ -174,7 +196,7 @@ p {
 }
 
 .works:hover .work {
-	opacity:0.25;
+	opacity:0.5;
 }
 
 .works:hover .work:hover {
@@ -184,4 +206,29 @@ p {
 .work img {
 	width:100%;
 	height:auto;
+}
+
+.form-group {
+	clear:both;
+	padding:0 0 12px 0;
+}
+
+.label {
+	float:left;
+	width:100px;
+	padding:6px;
+	display:block;
+	text-align:right;
+}
+
+.input {
+	font-family: 'Armata', sans-serif;
+	padding:6px;
+	font-size:11px;
+	width:250px;
+}
+
+.input-large {
+	width:400px;
+	height:100px;
 }
