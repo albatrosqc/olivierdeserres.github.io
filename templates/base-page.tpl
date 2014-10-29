@@ -5,17 +5,19 @@
         
         <title>{{ titre-site }}</title>
         
-        <meta name="description" content="{{ description-sitre }}">
+        <meta name="description" content="{{ description-site }}">
+        
+        <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
         
         <!-- Facebook share -->
         <meta property="og:title" content="{{ titre-site }}"/>
-        <meta property="og:description" content="{{ description-sitre }}"/>
+        <meta property="og:description" content="{{ description-site }}"/>
         <meta property="og:image" content="{{ share-image-site }}"/>
         
         <!-- Twitter share -->
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="{{ titre-site }}">
-        <meta name="twitter:description" content="{{ description-sitre }}">
+        <meta name="twitter:description" content="{{ description-site }}">
         <meta name="twitter:image:src" content="{{ share-image-site }}">
         <meta name="twitter:domain" content="www.olivierdeserres.com">
         
@@ -30,34 +32,39 @@
         <link href="css/global.css" media="all" rel="stylesheet" type="text/css">
     </head>
     <body>
-        <div class="notes">
-            <p>Background : morceau d'une toile, shape abstraite</p>
-            <p>Logo : signature, handwritten</p>
-            <p>Roll-over work : info</p>
-            <p>Click work : overlay, close cursor, navigation sidescreen</p>
-        </div>
-        
         <div class="wrapper">
             <header class="header cf">
-           
                 <h1 class="title"><a href="index.html">Olivier<span> </span><em>De<span> </span>Serres</em></a></h1>
-                
-                {% include "navigation.html" %}
-           
-            </header> 
+        
+                <nav class="nav nav-header">
+                    <ul class="cf">
+                        {% for elements in headerNav %}
+                            {{ elements }}
+                        {% endfor %}
+                    </ul>
+                </nav>        
+            </header>
+            
             <div class="content">
+                
+                {% block CONTENT_NAV %}
+
+                {% endblock %}
 
                 {% block CONTENT %}
 
 
                 {% endblock %}
 
+
             </div><!--content-->
             
         </div><!--wrapper-->
-
-        {% block SCRIPTS %}            
-        {% endblock %}
         
+        {% block EXTRA_SCRIPTS %}
+
+        {% endblock %}
+        <script src="app.js"></script>
+
     </body>
 </html>

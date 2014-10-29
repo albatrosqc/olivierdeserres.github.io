@@ -1,5 +1,5 @@
  ✔ Dropbox @done (14-10-29 09:51)
  ✔ Scanner Dropbox qui construit une liste des pages à générer @done (14-10-29 11:06)
- ☐ Scanner des csv qui construit des dictionnaires 
- ☐ Templates
+ ✔ Scanner des YAML qui construit des dictionnaires @done (14-10-29 13:47)
+ ✔ Templates @done (14-10-29 15:03)
  ☐ If travaux: thumbmailer
