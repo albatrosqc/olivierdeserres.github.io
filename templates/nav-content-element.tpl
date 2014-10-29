@@ -1,3 +1,1 @@
-<li>
-    <a href="#{{ category-url }}" class="active" data-hover="{{ category-name }}">{{ category-name }}</a>
-</li>
+<li><a href="#{{ category_url }}" data-hover="{{ category_name }}">{{ category_name }}</a></li>

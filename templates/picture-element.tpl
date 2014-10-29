@@ -1,5 +1,5 @@
-<div data-category="{{ category-name }}" class="work">
-        <a rel="work" title="{{ image-titre }}" href="{{ image-url }}">
-            <img src="{{ image-thumbnail-url }}" />
+<div data-category="{{ category_name }}" class="work">
+        <a rel="work" title="{{ image_titre }}" href="{{ image_url }}">
+            <img src="{{ image_thumbnail_url }}" />
         </a>
 </div>

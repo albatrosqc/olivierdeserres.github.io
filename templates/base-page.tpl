@@ -3,28 +3,28 @@
     <head>
         <meta charset="utf-8">
         
-        <title>{{ titre-site }}</title>
+        <title>{{ titre_site }}</title>
         
-        <meta name="description" content="{{ description-site }}">
+        <meta name="description" content="{{ description_site }}">
         
         <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
         
         <!-- Facebook share -->
-        <meta property="og:title" content="{{ titre-site }}"/>
-        <meta property="og:description" content="{{ description-site }}"/>
-        <meta property="og:image" content="{{ share-image-site }}"/>
+        <meta property="og:title" content="{{ titre_site }}"/>
+        <meta property="og:description" content="{{ description_site }}"/>
+        <meta property="og:image" content="{{ share_image_site }}"/>
         
         <!-- Twitter share -->
         <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="{{ titre-site }}">
-        <meta name="twitter:description" content="{{ description-site }}">
-        <meta name="twitter:image:src" content="{{ share-image-site }}">
+        <meta name="twitter:title" content="{{ titre_site }}">
+        <meta name="twitter:description" content="{{ description_site }}">
+        <meta name="twitter:image:src" content="{{ share_image_site }}">
         <meta name="twitter:domain" content="www.olivierdeserres.com">
         
         <!-- Mobile configuration -->
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-title" content="{{ titre-site }}">
+        <meta name="apple-mobile-web-app-title" content="{{ titre_site }}">
         
         <!-- Stylesheet -->
         <link href="http://fonts.googleapis.com/css?family=Oswald:400,300|Armata" rel="stylesheet" type="text/css">
@@ -38,7 +38,8 @@
         
                 <nav class="nav nav-header">
                     <ul class="cf">
-                        {% for elements in headerNav %}
+
+                        {% for elements in headerNav -%}
                             {{ elements }}
                         {% endfor %}
                     </ul>
@@ -48,12 +49,9 @@
             <div class="content">
                 
                 {% block CONTENT_NAV %}
-
                 {% endblock %}
 
                 {% block CONTENT %}
-
-
                 {% endblock %}
 
 
@@ -62,7 +60,6 @@
         </div><!--wrapper-->
         
         {% block EXTRA_SCRIPTS %}
-
         {% endblock %}
         <script src="app.js"></script>
 
