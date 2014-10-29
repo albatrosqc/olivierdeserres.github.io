@@ -154,6 +154,15 @@ p {
 	padding:5px 10px;
 	text-transform:lowercase;
 }
+
+.nav-title {
+	font-weight:bold;
+	display:inline-block;
+	padding:5px 10px;
+	width:70px;
+	text-align:right;
+}
+
 .works {
 	padding:12px 0;
 }
