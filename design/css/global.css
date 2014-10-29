@@ -153,6 +153,31 @@ p {
 	display:inline-block;
 	padding:5px 10px;
 	text-transform:lowercase;
+	position:relative;
+	text-decoration:none;
+}
+
+.nav ul li a::before {
+	position: absolute;
+	top: 0;
+	left: 0;
+	overflow: hidden;
+	padding:5px 0px 0px 0px;
+	margin:0px 10px;
+	max-width: 0;
+	border-bottom: 1px solid #fff;
+	color: #fff;
+	content: attr(data-hover);
+	-webkit-transition: max-width 0.25s ease-out;
+	-moz-transition: max-width 0.25s ease-out;
+	transition: max-width 0.25s ease-out;
+	white-space: nowrap;
+}
+
+.nav ul li a.active::before,
+.nav ul li a:hover::before,
+.nav ul li a:focus::before {
+	max-width: 100%;
 }
 
 .nav-title {
