@@ -36,13 +36,6 @@ class StaticGenerator :
 
         self.tree[currentPath[len(self.dropboxPath):]+"/"]=fileList
 
-    def ScanDirectory(self) :
-        self.BuildTree(self.dropboxPath)
-        for directory in self.tree :
-            for f in self.tree[directory]:
-                path=self.dropboxPath+directory+f
-                return name, content = self.ReadFile(path)
-
     def ReadFile(self,filePath) :
         """ 
             Determine if a file contains YAML.
@@ -57,3 +50,11 @@ class StaticGenerator :
             return name, yaml.load(f.read())
 
         return name, {"Files":None} 
+
+    def ScanDirectory(self) :
+        self.BuildTree(self.dropboxPath)
+        for directory in self.tree :
+            for f in self.tree[directory]:
+                path=self.dropboxPath+directory+f
+                return name, content = self.ReadFile(path)
+
