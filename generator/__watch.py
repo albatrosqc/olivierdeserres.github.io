@@ -21,7 +21,8 @@ class StatGenEvenHandler(FileSystemEventHandler) :
         logging.info("SetupOutputDirectory()")
         self.SetupOutputDirectory()
         logging.info("GenerateWebsite()")
-        self.statGen.GenerateWebsite()
+        success = self.statGen.GenerateWebsite()
+        logging.info("Operation successful.")
 
     def CleanOutputDirectory(self) :
         logging.info("Removing tree "+self.statGen.outputPath)
@@ -47,11 +48,10 @@ class StatGenEvenHandler(FileSystemEventHandler) :
 
 
 def main(argv=None):
-    # redacted, for privacy
-    dropboxPath="~/Dropbox/olivierdeserres/"
-    target="~/olivierdeserres.github.io/target/"
+    dropboxPath="/root/Dropbox/olivierdeserres/"
+    target="/root/olivierdeserres.github.io/generated/"
 
-    sg = StaticGenerator(dropboxPath,target,"travaux")
+    sg = StaticGenerator(dropboxPath,target)
 
     observer = Observer()
     event_handler = StatGenEvenHandler(observer,sg)

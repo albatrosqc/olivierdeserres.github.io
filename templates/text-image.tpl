@@ -1,0 +1,1 @@
+<img src="img/{{ image_url }}" style="width:33%; float:left; padding:0 24px 100px 0;" />

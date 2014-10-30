@@ -5,7 +5,6 @@ import os
 import yaml
 import time
 import shutil
-import logging
 
 class StaticGenerator :
     """
@@ -22,7 +21,7 @@ class StaticGenerator :
     sections=list()
     landingPage=""
 
-    def __init__(self, dropboxPath, outputPath, landingPage) :
+    def __init__(self, dropboxPath, outputPath) :
         """
             Constructor: initialize with the absolute path to the
             Dropbox folder, output directory and relative path of the
@@ -30,13 +29,10 @@ class StaticGenerator :
         """
         self.dropboxPath = dropboxPath
         self.outputPath = outputPath
-        self.landingPage = landingPage
         
         self.BuildTree(dropboxPath)
         self.InitMeta()
         self.InitSections()
-
-        logging.basicConfig(filename='generator.log',level=logging.INFO, format='[%(levelname)s] %(asctime)s : %(message)s', datefmt='%d-%m-%y %H:%M:%S')
 
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -68,8 +64,10 @@ class StaticGenerator :
                 if self.meta["page_order"].count(strippedName) > 0:
                     self.sections.append(strippedName)
         # Sort sections according to meta
-        self.sections=self.meta["page_order"]
-
+        self.sections = self.meta["page_order"]
+        for idx in range(0,len(self.sections)) :
+            if isinstance(self.sections[idx], unicode) == False :
+                self.sections[idx] = self.sections[idx].decode(encoding='UTF-8')
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Utilities
@@ -104,19 +102,17 @@ class StaticGenerator :
                 if content.get("Files") != None or content.get("header") != None :
                     if (contentType=="pictureContent") :
                         self.GeneratePicturePage(directory.rstrip("/"),content)
-                        logging.info("Generated "+directory.rstrip("/")+" [pictureType]")
                     if (contentType=="textContent") :
                         self.GenerateTextPage(directory.rstrip("/"),content)
-                        logging.info("Generated "+directory.rstrip("/")+" [textType]")
 
     def GenerateHeaderNav(self,name) :
         headerNavTpl = self.GetTemplate("nav-header-element.tpl")
         substitutions = list()
         for section in self.sections :
             templateVariables = dict()
-            if section == name :
+            if section == name.decode(encoding='UTF-8') :
                 templateVariables["active"] = True
-            if section == self.landingPage :
+            if section == self.meta["landing_page"] :
                 templateVariables["page_url"] = "index.html"
             else :
                 templateVariables["page_url"] = section.rsplit(" ")[-1]+".html"
@@ -124,14 +120,23 @@ class StaticGenerator :
             substitutions.append(headerNavTpl.render(templateVariables))
         return substitutions
 
+    def GenerateHtmlPage(self,name,pageTemplate,substitutions) :
+        # Generate html page
+        if name != self.meta["landing_page"] :
+            f = open(self.outputPath + name.rsplit(" ")[-1]  + ".html","w")
+        else :
+            f = open(self.outputPath + "index.html", "w")   
+        f.write(pageTemplate.render(dict(substitutions.items()+self.meta.items())).encode('utf8'))
+        f.close()
+
     def GeneratePicturePage(self,name,contentDictionary) :
         # Declare template variables
         substitutions = {"headerNav":[],"contentNav":[],"yearNav":[],"workList":[]}
         
         # fetch templates
-        pageTpl = self.GetTemplate("picture.tpl")
-        contentNavTpl = self.GetTemplate("nav-content-element.tpl")
-        pictureTpl = self.GetTemplate("picture-element.tpl")
+        pageTemplate = self.GetTemplate("picture-page.tpl")
+        navContentElementTemplate = self.GetTemplate("nav-content-element.tpl")
+        pictureElementTemplate = self.GetTemplate("picture-element.tpl")
 
         # Generate base navigation
         substitutions["headerNav"] = self.GenerateHeaderNav(name)
@@ -145,13 +150,13 @@ class StaticGenerator :
             if uniqueYears.count(element["year"]) == 0 :
                 uniqueYears.append(element["year"])
         # Generate extra navigations
-        substitutions["allNav"] = contentNavTpl.render({"category_url":"","category_name":"toutes"})
+        substitutions["allNav"] = navContentElementTemplate.render({"category_url":"","category_name":"toutes"})
         for element in uniqueCategories :
             templateVariables = {"category_url":element, "category_name":element}
-            substitutions["contentNav"].append(contentNavTpl.render(templateVariables))
+            substitutions["contentNav"].append(navContentElementTemplate.render(templateVariables))
         for element in uniqueYears :
             templateVariables = {"category_url":element, "category_name":element}
-            substitutions["yearNav"].append(contentNavTpl.render(templateVariables))
+            substitutions["yearNav"].append(navContentElementTemplate.render(templateVariables))
 
         # Determine workList
         workList = list()
@@ -165,16 +170,11 @@ class StaticGenerator :
                                  "image_url":"img/work/"+element["path"],
                                  "image_thumbnail_url":"img/thumb/"+element["path"],
                                  "image_year":element["year"]}
-            substitutions["workList"].append(pictureTpl.render(templateVariables))
+            substitutions["workList"].append(pictureElementTemplate.render(templateVariables))
 
         # Generate html page
-        if name != self.landingPage :
-            f = open(self.outputPath + name + ".html","w")
-        else :
-            f = open(self.outputPath + "index.html", "w")   
-        f.write(pageTpl.render(dict(substitutions.items()+self.meta.items())).encode('utf8'))
-        f.close()
-
+        self.GenerateHtmlPage(name,pageTemplate,substitutions)
+    
         # Move files
         for element in contentDictionary["Files"] :
             shutil.copyfile(self.dropboxPath+name+"/"+element["path"],self.outputPath+"img/work/"+element["path"])
@@ -182,56 +182,28 @@ class StaticGenerator :
 
     def GenerateTextPage(self,name,contentDictionary) :
         # Declare template variables
-        substitutions = {"headerNav":[],"contentNav":[],"yearNav":[],"workList":[]}
+        substitutions = dict()
+        pageTemplate = self.GetTemplate("text-page.tpl")
+        textImageTemplate = self.GetTemplate("text-image.tpl")
+        textContentTemplate = self.GetTemplate("text-content.tpl")
+        # Generate base navigation
+        substitutions["headerNav"] = self.GenerateHeaderNav(name)
         
-        # # fetch templates
-        # pageTpl = self.GetTemplate("picture.tpl")
-        # contentNavTpl = self.GetTemplate("nav-content-element.tpl")
-        # pictureTpl = self.GetTemplate("picture-element.tpl")
+        # Check for special page token (currently defined: CONTACT_FORM)
+        if contentDictionary["header"] == "CONTACT_FORM" :
+            formContactTpl = self.GetTemplate("form-contact.tpl")
+            substitutions["content_text"]=formContactTpl.render()
+        # Default case
+        else : 
+            # Fetch image
+            substitutions["content_image"] =  textImageTemplate.render({"image_url":contentDictionary["image"]})
 
-        # # Generate base navigation
-        # substitutions["headerNav"] = self.GenerateHeaderNav(name)
+            # Fetch text: render header, then content.
+            text = textContentTemplate.render({"text_content":contentDictionary["header"].split("\n")}) 
+            for section in contentDictionary["sections"] :
+                templateVariables = {"text_section_title":section["name"], "text_content": section["content"].split("\n") }
+                text = text+textContentTemplate.render(templateVariables)
+            substitutions["content_text"] = text
 
-        # # Determine extra navigations
-        # uniqueCategories = list()
-        # uniqueYears = list()
-        # for element in contentDictionary["Files"] :
-        #     if uniqueCategories.count(element["category"]) == 0 :
-        #         uniqueCategories.append(element["category"])
-        #     if uniqueYears.count(element["year"]) == 0 :
-        #         uniqueYears.append(element["year"])
-        # # Generate extra navigations
-        # substitutions["allNav"] = contentNavTpl.render({"category_url":"","category_name":"toutes"})
-        # for element in uniqueCategories :
-        #     templateVariables = {"category_url":element, "category_name":element}
-        #     substitutions["contentNav"].append(contentNavTpl.render(templateVariables))
-        # for element in uniqueYears :
-        #     templateVariables = {"category_url":element, "category_name":element}
-        #     substitutions["yearNav"].append(contentNavTpl.render(templateVariables))
+        self.GenerateHtmlPage(name,pageTemplate,substitutions)
 
-        # # Determine workList
-        # workList = list()
-        # for element in contentDictionary["Files"] :
-        #     workList.append(element)
-        # # Generate workList
-        # for element in contentDictionary["Files"] :
-        #     templateVariables = {"category_name":element["category"],
-        #                          "image_title":element["title"],
-        #                          "image_spec":element["spec"],
-        #                          "image_url":"img/work/"+element["path"],
-        #                          "image_thumbnail_url":"img/thumb/"+element["path"],
-        #                          "image_year":element["year"]}
-        #     substitutions["workList"].append(pictureTpl.render(templateVariables))
-
-        # # Generate html page
-        # if name != self.landingPage :
-        #     f = open(self.outputPath + name + ".html","w")
-        # else :
-        #     f = open(self.outputPath + "index.html", "w")   
-        # f.write(pageTpl.render(dict(substitutions.items()+self.meta.items())).encode('utf8'))
-        # f.close()
-
-        # # Move files
-        # for element in contentDictionary["Files"] :
-        #     shutil.copyfile(self.dropboxPath+name+"/"+element["path"],self.outputPath+"img/work/"+element["path"])
-        #     shutil.copyfile(self.dropboxPath+name+"/"+element["path"],self.outputPath+"img/thumb/"+element["path"])
