@@ -47,21 +47,16 @@
             </header>
             
             <div class="content">
-                
-                {% block CONTENT_NAV %}
-                {% endblock %}
+                    {% block CONTENT_NAV %}
+                    {% endblock %}
 
-                {% block CONTENT %}
-                {% endblock %}
-
-
+                    {% block CONTENT %}
+                    {% endblock %}
             </div><!--content-->
-            
         </div><!--wrapper-->
         
         {% block EXTRA_SCRIPTS %}
         {% endblock %}
-        <script src="app.js"></script>
-
+        <script src="js/app.js"></script>
     </body>
 </html>
