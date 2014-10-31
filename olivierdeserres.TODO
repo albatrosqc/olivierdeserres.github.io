@@ -2,4 +2,10 @@
  ✔ Scanner Dropbox qui construit une liste des pages à générer @done (14-10-29 11:06)
  ✔ Scanner des YAML qui construit des dictionnaires @done (14-10-29 13:47)
  ✔ Templates @done (14-10-29 15:03)
- ☐ If travaux: thumbmailer
+ ✔ Doc and test statgen @done (14-10-31 19:39)
+ ☐ Filemanager
+   ☐ background/share
+   ☐ resizer
+   ☐ setup
+ ☐ Timer update
+ ☐ IDE

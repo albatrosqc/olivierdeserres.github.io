@@ -1,70 +1,71 @@
-import time
-import sys
-import logging
-import shutil
-from pprint import pformat
+#!/usr/bin/python
+import time, datetime, sys, logging, pprint
+import yaml
 from staticgenerator import *
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-class StatGenEvenHandler(FileSystemEventHandler) :
-    def __init__(self, observer, statGen) :
+
+# Dependencies of the project
+#  OS/binaries:
+#   - Linux is recommended
+#   - imagemagick suite (convert for thumbnails / websized images, identify to fetch info)
+#   - file (to extract charset mimetype)
+#   - iconv (conversion between charsets)
+# 
+#  Python:
+#   - PyYaml
+#   - watchdog
+#   - jinja2
+
+
+def Now() :
+    return datetime.datetime.now().strftime("[%d-%m-%Y %H:%M] ")
+
+class EventHandler(FileSystemEventHandler) :
+
+    def __init__(self, observer, conf) :
         self.observer = observer
-        self.statGen = statGen
-        logging.basicConfig(filename='generator.log',level=logging.INFO, format='[%(levelname)s] %(asctime)s : %(message)s', datefmt='%d-%m-%y %H:%M:%S')
+        self.conf = conf
         
     def on_any_event(self, event) :
+        # Log event
         eventKey = event.key
-        logging.info(eventKey[0]+" "+eventKey[1]+" (is_directory == "+str(eventKey[2])+")")
-        logging.info("CleanOutputDirectory()")
-        self.CleanOutputDirectory()
-        logging.info("SetupOutputDirectory()")
-        self.SetupOutputDirectory()
-        logging.info("GenerateWebsite()")
-        success = self.statGen.GenerateWebsite()
-        logging.info("Operation successful.")
-
-    def CleanOutputDirectory(self) :
-        logging.info("Removing tree "+self.statGen.outputPath)
-        shutil.rmtree(self.statGen.outputPath,ignore_errors=True)
-
-    def SetupOutputDirectory(self) :
-        logging.info("Copying js to "+self.statGen.outputPath+"js")
-        shutil.copytree("js",self.statGen.outputPath+"js")
-        logging.info("Copying css to "+self.statGen.outputPath+"css")
-        shutil.copytree("css",self.statGen.outputPath+"css")
-        logging.info("Copying img to "+self.statGen.outputPath+"img")
-        shutil.copytree("img",self.statGen.outputPath+"img")
-        logging.info("Creating "+self.statGen.outputPath+"img/work/")
-        try : os.mkdir(self.statGen.outputPath+"img/work/")
-        except OSError: pass
-        logging.info("Creating "+self.statGen.outputPath+"img/thumb/")
-        try : os.mkdir(self.statGen.outputPath+"img/thumb/")
-        except OSError: pass
-
-
-
-
-
+        print Now()+eventKey[0]+" "+eventKey[1]+" (is_directory == "+str(eventKey[2])+")"
+        # Try to generate the page
+        try :
+            print Now()+"Initialization of StaticGenerator."
+            sg = StaticGenerator(self.conf["source_path"],self.conf["target_path"],self.conf["templates_path"])
+            print Now()+"Generating website."
+            sg.GenerateWebsite()
+        except IOError as exc:
+            print Now()+str(exc)
+        except yaml.YAMLError as exc:
+            print Now()+str(exc)
+        except :
+            print Now()+"Unexpected error:", sys.exc_info()[0]
+            pass
 
 def main(argv=None):
-    dropboxPath="/root/Dropbox/olivierdeserres/"
-    target="/root/olivierdeserres.github.io/generated/"
 
-    sg = StaticGenerator(dropboxPath,target)
+    conf = yaml.load(open("configuration.yml","r").read())
+    print Now()+"Configuration file loaded with success."
+    pprint.pprint(conf)
+    
+    obs = Observer()
+    event_handler = EventHandler(obs,conf)
+    obs.schedule(event_handler, conf["source_path"], recursive=True)
+    obs.start()
 
-    observer = Observer()
-    event_handler = StatGenEvenHandler(observer,sg)
-
-    observer.schedule(event_handler, dropboxPath, recursive=True)
-    observer.start()
-    try: 
-        while True:
+    try :
+        while True :
             time.sleep(1)
-    except KeyboardInterrupt:
-        observer.stop()
+    except KeyboardInterrupt :
+        obs.stop()
+        return 1
 
-    observer.join()
+    obs.stop()
+    obs.join()
     return 0
 
 if __name__ == "__main__":

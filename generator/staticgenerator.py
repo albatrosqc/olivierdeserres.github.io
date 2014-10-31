@@ -1,36 +1,74 @@
 #!/usr/bin/python
-
 import jinja2
-import os
 import yaml
-import time
-import shutil
+import hashlib, os, shutil, logging
+import pprint as pp
+
+# Configure CointipBot logger
+logging.basicConfig(filename='generator.log',level=logging.INFO, 
+                    format='[%(levelname)s] %(asctime)s : %(message)s', datefmt='%d-%m-%y %H:%M:%S')
+log = logging.getLogger("staticgenerator")
+
+class Helper :
+    ''' Small helper function that are useful for both StaticGenerator and FileManager. '''
+
+    def __init__(self) :
+        ''' Empty constructor; useful for direct usage within other classes'''
+        log.debug("Helper.__init__(0)")
+
+    def isYaml(self, filePath) :
+        ''' 
+            Override the default exception behavior of yaml.load(1) to turn it into a
+            simple test of validity.
+        '''
+        log.debug("Helper.isYaml(1) with filePath="+filePath)
+
+        try :
+            yaml.load(open(filePath,"r").read())
+            return True
+        except yaml.YAMLError:
+            return False
+
+    def URLFromDirectory(self, directory, index="") :
+        ''' 
+            Define a unique correspondence between a directory name
+            and a URL. Unified use of this functions enforce a unified 
+            naming scheme.
+            A directory that holds the content of the index is associated to
+            'index.html' automatically.
+        '''
+        log.debug("Helper.URLFromDirectory(2) with directory="+directory+", index="+index)
+        
+        if (directory==index) :
+            return "index.html"
+        else :
+            return directory.rsplit(" ")[-1]+".html"
+
 
 class StaticGenerator :
-    """
-        Generate html content from a Dropbox folder.
-    """
+    '''Generate HTML content from a source folder that follows the appropriate pattern.'''
 
     # Data members
     tree=dict()
     meta=dict()
 
-    dropboxPath=""
+    sourcePath=""
     outputPath=""
     
     sections=list()
-    landingPage=""
 
-    def __init__(self, dropboxPath, outputPath) :
-        """
-            Constructor: initialize with the absolute path to the
-            Dropbox folder, output directory and relative path of the
-            landing page.
-        """
-        self.dropboxPath = dropboxPath
+    def __init__(self, sourcePath, outputPath, templatesPath) :
+        '''
+            Initializes the StaticGenerator object with the absolute path to the
+            website source folder, and output directory.
+        '''
+        log.debug("StaticGenerator.__init__(3) with sourcePath="+sourcePath+", outputPath="+outputPath+", templatesPath="+templatesPath)
+
+        self.sourcePath = sourcePath
         self.outputPath = outputPath
-        
-        self.BuildTree(dropboxPath)
+        self.templatesPath = templatesPath
+
+        self.BuildTree(sourcePath)
         self.InitMeta()
         self.InitSections()
 
@@ -39,9 +77,9 @@ class StaticGenerator :
     # Initializers
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def BuildTree(self,filePath) :
-        """ 
-            Recursive directory tree builder.
-        """
+        '''Build the directory tree recursively from 'filePath'.'''
+        log.debug("StaticGenerator.BuildTree(1) with filePath="+filePath)
+
         contentList = os.listdir(filePath)
         fileList = []
         for content in contentList :
@@ -50,96 +88,138 @@ class StaticGenerator :
                 self.BuildTree(path)
             else :
                 fileList.append(content)
-        self.tree[filePath[len(self.dropboxPath):]+"/"]=fileList
+        self.tree[filePath[len(self.sourcePath):]+"/"]=fileList
 
     def InitMeta(self) :
-        f = open(self.dropboxPath+"metaContent.yml","r")
-        self.meta = yaml.load(f.read())
+        ''' Initialize the meta content from $sourcePath/meta-content.txt.'''
+        log.debug("StaticGenerator.InitMeta()")
+
+        metaFilePath = self.sourcePath+"meta-content.txt"
+        try:
+            content, name =self.ReadYaml(metaFilePath)
+        except yaml.YAMLError, exc:
+            raise 
+        self.meta = content
 
     def InitSections(self) :
-        # check that sections match the metaContent
+        ''' Initialize the section list, and checks that it matches the content of page_order.'''
+        log.debug("StaticGenerator.InitSections()")
+
+        # Sections are defined by the meta-content
+        self.sections = self.meta["page_order"]
+        # Log mismatch between directories and page_order
+        directorySections = list()
         for directory in self.tree :
             strippedName = directory.rstrip("/").decode(encoding='UTF-8')
-            if self.sections.count(strippedName)==0 and strippedName != "":
-                if self.meta["page_order"].count(strippedName) > 0:
-                    self.sections.append(strippedName)
-        # Sort sections according to meta
-        self.sections = self.meta["page_order"]
-        for idx in range(0,len(self.sections)) :
-            if isinstance(self.sections[idx], unicode) == False :
-                self.sections[idx] = self.sections[idx].decode(encoding='UTF-8')
+            if strippedName != "":
+                directorySections.append(strippedName)
+        for directory in directorySections :
+            if self.sections.count(directory) == 0 :
+                log.warning("The directory "+directory+" exists within the source directory "+ 
+                            self.sourcePath+" but does not appear in the page_order field of "+
+                            self.sourcePath+"meta-content.txt.")
+        for section in self.sections :
+            if directorySections.count(section) == 0 :
+                log.warning("The section '"+section+"' appears in the page_order field of "+
+                            self.sourcePath+"meta-content.txt but does not correspond "+
+                            "to a directory of "+self.sourcePath+".")
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Utilities
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def ReadFile(self,filePath) :
-        """ 
-            Determine if a file contains YAML.
-            If true, read and return content as a dictionary + file type.
-        """
+    def ReadYaml(self,filePath) :
+        '''
+            Read a file that (should) contain YAML and return its content (as a 
+            dictionary), and its contentType (name without the extension).
+        '''
+        log.debug("StaticGenerator.ReadYaml(1) with filePath="+filePath)
+
         directory, fileName = os.path.split(filePath)
-        name, extension = os.path.splitext(fileName)
-
-        if extension == ".yaml" or  extension == ".yml" :
-            f = open(filePath,"r")
-            return name, yaml.load(f.read())
-
-        return name, { "Files":None } 
+        contentType, extension = os.path.splitext(fileName)
+        try :
+            content = yaml.load(open(filePath,"r").read())
+            log.info( "Parsed "+filePath+". Contains valid YAML of type "+str(contentType))
+        except yaml.YAMLError, exc:
+            log.error(filePath+" contains invalid YAML. [Error on line "+
+                      str(exc.problem_mark.line+1)+", column "+str(exc.problem_mark.column+1)+"].")
+            raise 
+        return content, contentType
 
     def GetTemplate(self,templateName) :
-        templateLoader = jinja2.FileSystemLoader(searchpath = "../templates") 
+        '''Fetch a template from a path relative to the generator.'''
+        log.debug("StaticGenerator.GetTemplate(1) with templateName="+templateName)
+
+        templateLoader = jinja2.FileSystemLoader(searchpath = self.templatesPath) 
         env = jinja2.Environment( loader = templateLoader )
         return env.get_template( templateName )
+
+
+    def RenderTemplate(self,pageTemplate,substitutions,url) :
+        '''
+            Render a HTML page using a substitution dictionary and a template. 
+            Save the output to the output path.
+        '''
+        log.debug("StaticGenerator.RenderTemplate(3) with pageTemplate="+pageTemplate.name+", substitutions=[see next line], url="+url)
+        log.debug(pp.pformat(substitutions))
+
+        # Generate html page
+        f = open(self.outputPath + url,"w")
+        f.write(pageTemplate.render(dict(substitutions.items()+self.meta.items())).encode('utf8'))
+        f.close()
+
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Generators
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def GenerateWebsite(self) :
+        '''Trigger complete website generation.'''
+        log.debug("StaticGenerator.GenerateWebsite(0)")
+
         for directory in self.tree :
             for f in self.tree[directory]:
-                path=self.dropboxPath+directory+f
-                contentType, content = self.ReadFile(path)
-                if content.get("Files") != None or content.get("header") != None :
-                    if (contentType=="pictureContent") :
+                path=self.sourcePath+directory+f
+                if Helper().isYaml(path) :
+                    content, contentType = self.ReadYaml(path)
+                    if (contentType=="picture-content") :
                         self.GeneratePicturePage(directory.rstrip("/"),content)
-                    if (contentType=="textContent") :
+                    if (contentType=="text-content") :
                         self.GenerateTextPage(directory.rstrip("/"),content)
 
     def GenerateHeaderNav(self,name) :
-        headerNavTpl = self.GetTemplate("nav-header-element.tpl")
+        '''
+            Generate header navigation links. Return each link as HTML code, in a list.
+            Accounts for the calling location through 'name': this page will be defined
+            as 'active' in the header navigation links. 
+        '''
+        log.debug("StaticGenerator.GenerateHeaderNav(1) with name="+name)
+
+        headerNavTemplate = self.GetTemplate("nav-header-element.tpl")
         substitutions = list()
         for section in self.sections :
             templateVariables = dict()
             if section == name.decode(encoding='UTF-8') :
                 templateVariables["active"] = True
-            if section == self.meta["landing_page"] :
-                templateVariables["page_url"] = "index.html"
-            else :
-                templateVariables["page_url"] = section.rsplit(" ")[-1]+".html"
+            templateVariables["page_url"] = Helper().URLFromDirectory(section,self.meta["landing_page"])
             templateVariables["page_name"] = section
-            substitutions.append(headerNavTpl.render(templateVariables))
+            substitutions.append(headerNavTemplate.render(templateVariables))
         return substitutions
 
-    def GenerateHtmlPage(self,name,pageTemplate,substitutions) :
-        # Generate html page
-        if name != self.meta["landing_page"] :
-            f = open(self.outputPath + name.rsplit(" ")[-1]  + ".html","w")
-        else :
-            f = open(self.outputPath + "index.html", "w")   
-        f.write(pageTemplate.render(dict(substitutions.items()+self.meta.items())).encode('utf8'))
-        f.close()
+    def GeneratePicturePage(self,directory,contentDictionary) :
+        '''
+            Generate a picture page (HTML render included).
+        '''
+        log.debug("StaticGenerator.GeneratePicturePage(2) with directory="+directory+", contentDictionary=")
+        log.debug(pp.pformat(contentDictionary))
 
-    def GeneratePicturePage(self,name,contentDictionary) :
-        # Declare template variables
-        substitutions = {"headerNav":[],"contentNav":[],"yearNav":[],"workList":[]}
         
         # fetch templates
         pageTemplate = self.GetTemplate("picture-page.tpl")
         navContentElementTemplate = self.GetTemplate("nav-content-element.tpl")
         pictureElementTemplate = self.GetTemplate("picture-element.tpl")
+        substitutions = {"headerNav":[],"contentNav":[],"yearNav":[],"workList":[]}
 
         # Generate base navigation
-        substitutions["headerNav"] = self.GenerateHeaderNav(name)
+        substitutions["headerNav"] = self.GenerateHeaderNav(directory)
 
         # Determine extra navigations
         uniqueCategories = list()
@@ -158,10 +238,6 @@ class StaticGenerator :
             templateVariables = {"category_url":element, "category_name":element}
             substitutions["yearNav"].append(navContentElementTemplate.render(templateVariables))
 
-        # Determine workList
-        workList = list()
-        for element in contentDictionary["Files"] :
-            workList.append(element)
         # Generate workList
         for element in contentDictionary["Files"] :
             templateVariables = {"category_name":element["category"],
@@ -173,29 +249,32 @@ class StaticGenerator :
             substitutions["workList"].append(pictureElementTemplate.render(templateVariables))
 
         # Generate html page
-        self.GenerateHtmlPage(name,pageTemplate,substitutions)
-    
-        # Move files
-        for element in contentDictionary["Files"] :
-            shutil.copyfile(self.dropboxPath+name+"/"+element["path"],self.outputPath+"img/work/"+element["path"])
-            shutil.copyfile(self.dropboxPath+name+"/"+element["path"],self.outputPath+"img/thumb/"+element["path"])
+        self.RenderTemplate(pageTemplate,substitutions,Helper().URLFromDirectory(directory,self.meta["landing_page"]))
 
-    def GenerateTextPage(self,name,contentDictionary) :
-        # Declare template variables
-        substitutions = dict()
+
+    def GenerateTextPage(self,directory,contentDictionary) :
+        '''
+            Generate a text page (HTML render included).
+        '''
+        log.debug("StaticGenerator.GenerateTextPage(2) with directory="+directory+", contentDictionary=")
+        log.debug(pp.pformat(contentDictionary))
+
+        # fetch templates
         pageTemplate = self.GetTemplate("text-page.tpl")
         textImageTemplate = self.GetTemplate("text-image.tpl")
         textContentTemplate = self.GetTemplate("text-content.tpl")
+
         # Generate base navigation
-        substitutions["headerNav"] = self.GenerateHeaderNav(name)
+        substitutions=dict()
+        substitutions["headerNav"] = self.GenerateHeaderNav(directory)
         
-        # Check for special page token (currently defined: CONTACT_FORM)
+        # Check for special page token (currently supported: CONTACT_FORM)
         if contentDictionary["header"] == "CONTACT_FORM" :
-            formContactTpl = self.GetTemplate("form-contact.tpl")
-            substitutions["content_text"]=formContactTpl.render()
+            formContactTemplate = self.GetTemplate("form-contact.tpl")
+            substitutions["content_text"]=formContactTemplate.render()
         # Default case
         else : 
-            # Fetch image
+            # Fetch text page image
             substitutions["content_image"] =  textImageTemplate.render({"image_url":contentDictionary["image"]})
 
             # Fetch text: render header, then content.
@@ -205,5 +284,59 @@ class StaticGenerator :
                 text = text+textContentTemplate.render(templateVariables)
             substitutions["content_text"] = text
 
-        self.GenerateHtmlPage(name,pageTemplate,substitutions)
+        self.RenderTemplate(pageTemplate,substitutions,Helper().URLFromDirectory(directory,self.meta["landing_page"]))
 
+
+class FileManager:
+    '''Manage the file system for StaticGenerator.'''
+
+    def __init__(self, sourceBasePath, templateBasePath, temporaryBasePath, outputBasePath) :
+        self.sourceBasePath = sourceBasePath
+        self.templateBasePath = templateBasePath
+        self.temporaryBasePath = temporaryBasePath
+        self.outputBasePath = outputBasePath
+
+
+    def GetUniqueName(self, uniqueString) :
+        m=hashlib.sha1()
+        m.update(uniqueString)
+        return m.hexdigest()
+
+    def Encode(self, fileName) :
+        uniqueTemporaryName = self.GetUniqueName(fileName)
+        os.system("iconv -f $(file --mime-encoding "+fileName+" | awk '{ print $2 }') -t utf-8 "+fileName+" > "+uniqueTemporaryName)
+        os.system("mv "+uniqueTemporaryName+" "+fileName)
+        os.system("rm "+uniqueTemporaryName)
+
+    def ResizeForThumbnails(self,originalPath,finalPath) :
+        os.system("convert -resize 250x "+originalPath+" "+finalPath)
+
+    def ResizeForWeb(self,originalPath,finalPath) :
+        os.system("convert -resize x750 "+originalPath+" "+finalPath)
+        
+
+    def CleanOutputDirectory(self) :
+        logging.info("Removing tree "+self.statGen.outputPath)
+        shutil.rmtree(self.statGen.outputPath,ignore_errors=True)
+
+    def SetupOutputDirectory(self) :
+        logging.info("Copying js to "+self.statGen.outputPath+"js")
+        shutil.copytree("js",self.statGen.outputPath+"js")
+        logging.info("Copying css to "+self.statGen.outputPath+"css")
+        shutil.copytree("css",self.statGen.outputPath+"css")
+        logging.info("Copying img to "+self.statGen.outputPath+"img")
+        shutil.copytree("img",self.statGen.outputPath+"img")
+        logging.info("Creating "+self.statGen.outputPath+"img/work/")
+        try : os.mkdir(self.statGen.outputPath+"img/work/")
+        except OSError: pass
+        logging.info("Creating "+self.statGen.outputPath+"img/thumb/")
+        try : os.mkdir(self.statGen.outputPath+"img/thumb/")
+        except OSError: pass
+
+    # def SourceValidate(self) :
+        # Validate the source directory sanity (UTF 8, depth)
+    
+        # # Move files
+        # for element in contentDictionary["Files"] :
+        #     shutil.copyfile(self.sourcePath+name+"/"+element["path"],self.outputPath+"img/work/"+element["path"])
+        #     shutil.copyfile(self.sourcePath+name+"/"+element["path"],self.outputPath+"img/thumb/"+element["path"])

@@ -1,0 +1,4 @@
+source_path : "ABSOLUTE_PATH_TO/Dropbox/olivierdeserres/"
+target_path : "ABSOLUTE_PATH_TO/olivierdeserres.github.io/dev/"
+templates_path : "ABSOLUTE_PATH_TO/olivierdeserres.github.io/templates"
+temporaty_path : "ABSOLUTE_PATH_TO/tmp"
