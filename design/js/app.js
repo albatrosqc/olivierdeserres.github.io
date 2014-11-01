@@ -19,7 +19,7 @@ var App = (function() {
 		// TODO : disable links when no results
 		
 		// Prepare parameters
-		var $selectors = $('.nav-works a.active');
+		var $selectors = $navWorks.find('a.active');
 		var params = {};
 		
 		// Loop through active links and build parameters
@@ -66,6 +66,10 @@ var App = (function() {
 		// TODO : reset fancybox with only visible ones
 	};
 	
+	var onWindowResize = function(ev) {
+		// $container.packery('layout');
+	};
+	
 	// Constructor
 	
 	var construct = (function() {
@@ -91,6 +95,7 @@ var App = (function() {
 		$navWorks.find('a').on('click', onNavWorksClick);
 		
 		// Hash change event
-		$(window).bind('hashchange', onHashChange).trigger('hashchange');
+		$(window).on('hashchange', onHashChange).trigger('hashchange');
+		$(window).on('resize', onWindowResize);
 	})();
 })();
