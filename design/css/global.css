@@ -1,4 +1,9 @@
+/**----------------------------------------------
+	Global
+------------------------------------------------- */
+
 /* apply a natural box layout model to all elements, but allowing components to change */
+
 html {
 	box-sizing: border-box;
 }
@@ -11,6 +16,10 @@ html {
 	margin:0;
 	padding:0;
 }
+
+/**----------------------------------------------
+	General
+------------------------------------------------- */
 
 html {
      overflow: -moz-scrollbars-vertical;
@@ -39,13 +48,13 @@ body:after {
 	top:0;
 	left:0;
 	
-background: -moz-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.8) 42%, rgba(0,0,0,0.8) 48%, rgba(0,0,0,0) 100%); /* FF3.6+ */
-background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(42%,rgba(0,0,0,0.8)), color-stop(48%,rgba(0,0,0,0.8)), color-stop(100%,rgba(0,0,0,0))); /* Chrome,Safari4+ */
-background: -webkit-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.8) 42%,rgba(0,0,0,0.8) 48%,rgba(0,0,0,0) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.8) 42%,rgba(0,0,0,0.8) 48%,rgba(0,0,0,0) 100%); /* Opera 12+ */
-background: -ms-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.8) 42%,rgba(0,0,0,0.8) 48%,rgba(0,0,0,0) 100%); /* IE10+ */
-background: radial-gradient(ellipse at center,  rgba(0,0,0,0.8) 42%,rgba(0,0,0,0.8) 48%,rgba(0,0,0,0) 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cc000000', endColorstr='#00000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+	background: -moz-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.8) 42%, rgba(0,0,0,0.8) 48%, rgba(0,0,0,0) 100%); /* FF3.6+ */
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(42%,rgba(0,0,0,0.8)), color-stop(48%,rgba(0,0,0,0.8)), color-stop(100%,rgba(0,0,0,0))); /* Chrome,Safari4+ */
+	background: -webkit-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.8) 42%,rgba(0,0,0,0.8) 48%,rgba(0,0,0,0) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.8) 42%,rgba(0,0,0,0.8) 48%,rgba(0,0,0,0) 100%); /* Opera 12+ */
+	background: -ms-radial-gradient(center, ellipse cover,  rgba(0,0,0,0.8) 42%,rgba(0,0,0,0.8) 48%,rgba(0,0,0,0) 100%); /* IE10+ */
+	background: radial-gradient(ellipse at center,  rgba(0,0,0,0.8) 42%,rgba(0,0,0,0.8) 48%,rgba(0,0,0,0) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cc000000', endColorstr='#00000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 
 
 }
@@ -63,7 +72,10 @@ p {
 	margin: 1.12em 0;
 }
 
-/* Clearfix */
+/**----------------------------------------------
+	Clearfix
+------------------------------------------------- */
+
 .cf:before,
 .cf:after {
     content: " "; /* 1 */
@@ -78,16 +90,9 @@ p {
     *zoom: 1;
 }
 
-.notes {
-	position:absolute;
-	width:200px;
-	top:12px;
-	left:12px;
-	background-color:#F0E080;
-	padding:0 12px;
-	color:#111;
-	display:none;
-}
+/**----------------------------------------------
+	Layout
+------------------------------------------------- */
 
 .wrapper {
 	margin:0 auto;
@@ -101,6 +106,14 @@ p {
 	margin:0 0 12px 0;
 	border-bottom:1px solid rgba(255, 255, 255, 0.15);
 }
+
+/**----------------------------------------------
+	Modules
+------------------------------------------------- */
+
+/**----------------------------------------------
+	Titles
+------------------------------------------------- */
 
 .title {
 	float:left;
@@ -133,6 +146,10 @@ p {
 .title a:hover {
 	opacity:0.8;
 }
+
+/**----------------------------------------------
+	Navigations
+------------------------------------------------- */
 
 .nav.nav-header {
 	float:right;
@@ -188,27 +205,13 @@ p {
 	text-align:right;
 }
 
+/**----------------------------------------------
+	Works
+------------------------------------------------- */
+
 .works {
 	padding:12px 0;
 }
-
-/*
-
-.work {
-	flex-grow:1;
-	width:235px;
-	height:235px;
-	overflow:hidden;
-	background-repeat:no-repeat;
-	background-size:cover;
-	background-position:center center;
-	-webkit-transition: opacity 0.25s ease-out;
-	-moz-transition: opacity 0.25s ease-out;
-	-ms-transition: opacity 0.25s ease-out;
-	-o-transition: opacity 0.25s ease-out;
-	transition: opacity 0.25s ease-out;
-}
-*/
 
 .gutter-sizer {
 	width:1%;
@@ -243,6 +246,10 @@ p {
 	width:100%;
 	height:auto;
 }
+
+/**----------------------------------------------
+	Forms
+------------------------------------------------- */
 
 .form-group {
 	clear:both;
