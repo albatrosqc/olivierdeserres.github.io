@@ -1,3 +1,6 @@
+# Don't commit custom configuration files
+configuration.yml
+
 # Created by https://www.gitignore.io
 
 ### Python ###
