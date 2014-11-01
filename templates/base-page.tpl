@@ -12,13 +12,13 @@
         <!-- Facebook share -->
         <meta property="og:title" content="{{ titre_site }}"/>
         <meta property="og:description" content="{{ description_site }}"/>
-        <meta property="og:image" content="{{ path_to_design_img }}{{ share_image }}"/>
+        <meta property="og:image" content="img/{{ share_image }}"/>
         
         <!-- Twitter share -->
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="{{ titre_site }}">
         <meta name="twitter:description" content="{{ description_site }}">
-        <meta name="twitter:image:src" content="{{ path_to_design_img }}{ share_image }}">
+        <meta name="twitter:image:src" content="img/{{ share_image }}">
         <meta name="twitter:domain" content="www.olivierdeserres.com">
         
         <!-- Mobile configuration -->

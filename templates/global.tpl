@@ -20,7 +20,7 @@ html {
 body {
 	font-family: 'Armata', sans-serif;
 	background-color:#111;
-	background-image:url(../img/background-1.jpg);
+	background-image:url(../img/{{ background_image }});
 	background-repeat:no-repeat;
 	background-position:center center;
 	background-attachment:fixed;

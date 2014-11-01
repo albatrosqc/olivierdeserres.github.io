@@ -5,16 +5,34 @@ import hashlib, os, shutil, logging
 import pprint as pp
 
 # Configure CointipBot logger
-logging.basicConfig(filename='generator.log',level=logging.INFO, 
+logging.basicConfig(filename='generator.log',level=logging.DEBUG, 
                     format='[%(levelname)s] %(asctime)s : %(message)s', datefmt='%d-%m-%y %H:%M:%S')
 log = logging.getLogger("staticgenerator")
 
 class Helper :
     ''' Small helper function that are useful for both StaticGenerator and FileManager. '''
 
+    # Data members
+    tree=dict()
+
     def __init__(self) :
         ''' Empty constructor; useful for direct usage within other classes'''
         log.debug("Helper.__init__(0)")
+
+    def BuildTree(self,filePath,absoluteBase) :
+        '''Build the directory tree recursively from 'filePath'.'''
+        log.debug("Helper.BuildTree(1) with filePath="+filePath)
+
+        contentList = os.listdir(filePath,)
+        fileList = []
+        for content in contentList :
+            path = os.path.join(filePath,content)
+            if os.path.isdir(path) :
+                self.BuildTree(path,absoluteBase)
+            else :
+                fileList.append(content)
+        self.tree[filePath[len(absoluteBase):]+"/"]=fileList
+        return self.tree
 
     def isYaml(self, filePath) :
         ''' 
@@ -28,6 +46,24 @@ class Helper :
             return True
         except yaml.YAMLError:
             return False
+
+    def ReadYaml(self,filePath) :
+        '''
+            Read a file that (should) contain YAML and return its content (as a 
+            dictionary), and its contentType (name without the extension).
+        '''
+        log.debug("Helper.ReadYaml(1) with filePath="+filePath)
+
+        directory, fileName = os.path.split(filePath)
+        contentType, extension = os.path.splitext(fileName)
+        try :
+            content = yaml.load(open(filePath,"r").read())
+            log.info( "Parsed "+filePath+". Contains valid YAML of type "+str(contentType))
+        except yaml.YAMLError, exc:
+            log.error(filePath+" contains invalid YAML. [Error on line "+
+                      str(exc.problem_mark.line+1)+", column "+str(exc.problem_mark.column+1)+"].")
+            raise 
+        return content, contentType
 
     def URLFromDirectory(self, directory, index="") :
         ''' 
@@ -44,6 +80,24 @@ class Helper :
         else :
             return directory.rsplit(" ")[-1]+".html"
 
+    def PrettifiedFileName(self, filename) :
+        ''' 
+            Define a unique correspondence between a file name
+            and a prettified file name (lowercase, underscore for whitespace). 
+            Unified use of this functions enforce a unified naming scheme.
+        '''
+        log.debug("Helper.PrettifiedFileName(1) with filename="+filename)
+        
+        return filename.lower().replace(" ","_")
+
+    def GetTemplate(self,templateName,templatePath) :
+        '''Fetch a template from a path relative to the generator.'''
+        log.debug("Helper.GetTemplate(2) with templateName="+templateName+", templatesPath="+templatePath)
+
+        templateLoader = jinja2.FileSystemLoader(searchpath = templatePath) 
+        env = jinja2.Environment( loader = templateLoader )
+        return env.get_template( templateName )
+
 
 class StaticGenerator :
     '''Generate HTML content from a source folder that follows the appropriate pattern.'''
@@ -51,11 +105,10 @@ class StaticGenerator :
     # Data members
     tree=dict()
     meta=dict()
-
+    sections=list()
     sourcePath=""
     outputPath=""
-    
-    sections=list()
+    templatesPath=""
 
     def __init__(self, sourcePath, outputPath, templatesPath) :
         '''
@@ -68,7 +121,8 @@ class StaticGenerator :
         self.outputPath = outputPath
         self.templatesPath = templatesPath
 
-        self.BuildTree(sourcePath)
+
+        self.tree = Helper().BuildTree(sourcePath,sourcePath)
         self.InitMeta()
         self.InitSections()
 
@@ -76,27 +130,13 @@ class StaticGenerator :
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Initializers
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def BuildTree(self,filePath) :
-        '''Build the directory tree recursively from 'filePath'.'''
-        log.debug("StaticGenerator.BuildTree(1) with filePath="+filePath)
-
-        contentList = os.listdir(filePath)
-        fileList = []
-        for content in contentList :
-            path = os.path.join(filePath,content)
-            if os.path.isdir(path) :
-                self.BuildTree(path)
-            else :
-                fileList.append(content)
-        self.tree[filePath[len(self.sourcePath):]+"/"]=fileList
-
     def InitMeta(self) :
         ''' Initialize the meta content from $sourcePath/meta-content.txt.'''
         log.debug("StaticGenerator.InitMeta()")
 
         metaFilePath = self.sourcePath+"meta-content.txt"
         try:
-            content, name =self.ReadYaml(metaFilePath)
+            content, name = Helper().ReadYaml(metaFilePath)
         except yaml.YAMLError, exc:
             raise 
         self.meta = content
@@ -127,33 +167,6 @@ class StaticGenerator :
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Utilities
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def ReadYaml(self,filePath) :
-        '''
-            Read a file that (should) contain YAML and return its content (as a 
-            dictionary), and its contentType (name without the extension).
-        '''
-        log.debug("StaticGenerator.ReadYaml(1) with filePath="+filePath)
-
-        directory, fileName = os.path.split(filePath)
-        contentType, extension = os.path.splitext(fileName)
-        try :
-            content = yaml.load(open(filePath,"r").read())
-            log.info( "Parsed "+filePath+". Contains valid YAML of type "+str(contentType))
-        except yaml.YAMLError, exc:
-            log.error(filePath+" contains invalid YAML. [Error on line "+
-                      str(exc.problem_mark.line+1)+", column "+str(exc.problem_mark.column+1)+"].")
-            raise 
-        return content, contentType
-
-    def GetTemplate(self,templateName) :
-        '''Fetch a template from a path relative to the generator.'''
-        log.debug("StaticGenerator.GetTemplate(1) with templateName="+templateName)
-
-        templateLoader = jinja2.FileSystemLoader(searchpath = self.templatesPath) 
-        env = jinja2.Environment( loader = templateLoader )
-        return env.get_template( templateName )
-
-
     def RenderTemplate(self,pageTemplate,substitutions,url) :
         '''
             Render a HTML page using a substitution dictionary and a template. 
@@ -179,7 +192,7 @@ class StaticGenerator :
             for f in self.tree[directory]:
                 path=self.sourcePath+directory+f
                 if Helper().isYaml(path) :
-                    content, contentType = self.ReadYaml(path)
+                    content, contentType = Helper().ReadYaml(path)
                     if (contentType=="picture-content") :
                         self.GeneratePicturePage(directory.rstrip("/"),content)
                     if (contentType=="text-content") :
@@ -193,7 +206,7 @@ class StaticGenerator :
         '''
         log.debug("StaticGenerator.GenerateHeaderNav(1) with name="+name)
 
-        headerNavTemplate = self.GetTemplate("nav-header-element.tpl")
+        headerNavTemplate = Helper().GetTemplate("nav-header-element.tpl", self.templatesPath)
         substitutions = list()
         for section in self.sections :
             templateVariables = dict()
@@ -211,11 +224,10 @@ class StaticGenerator :
         log.debug("StaticGenerator.GeneratePicturePage(2) with directory="+directory+", contentDictionary=")
         log.debug(pp.pformat(contentDictionary))
 
-        
         # fetch templates
-        pageTemplate = self.GetTemplate("picture-page.tpl")
-        navContentElementTemplate = self.GetTemplate("nav-content-element.tpl")
-        pictureElementTemplate = self.GetTemplate("picture-element.tpl")
+        pageTemplate = Helper().GetTemplate("picture-page.tpl", self.templatesPath)
+        navContentElementTemplate = Helper().GetTemplate("nav-content-element.tpl", self.templatesPath)
+        pictureElementTemplate = Helper().GetTemplate("picture-element.tpl", self.templatesPath)
         substitutions = {"headerNav":[],"contentNav":[],"yearNav":[],"workList":[]}
 
         # Generate base navigation
@@ -243,8 +255,8 @@ class StaticGenerator :
             templateVariables = {"category_name":element["category"],
                                  "image_title":element["title"],
                                  "image_spec":element["spec"],
-                                 "image_url":"img/work/"+element["path"],
-                                 "image_thumbnail_url":"img/thumb/"+element["path"],
+                                 "image_url":"img/work/"+Helper().PrettifiedFileName(element["path"]),
+                                 "image_thumbnail_url":"img/thumb/"+Helper().PrettifiedFileName(element["path"]),
                                  "image_year":element["year"]}
             substitutions["workList"].append(pictureElementTemplate.render(templateVariables))
 
@@ -260,9 +272,9 @@ class StaticGenerator :
         log.debug(pp.pformat(contentDictionary))
 
         # fetch templates
-        pageTemplate = self.GetTemplate("text-page.tpl")
-        textImageTemplate = self.GetTemplate("text-image.tpl")
-        textContentTemplate = self.GetTemplate("text-content.tpl")
+        pageTemplate = Helper().GetTemplate("text-page.tpl", self.templatesPath)
+        textImageTemplate = Helper().GetTemplate("text-image.tpl", self.templatesPath)
+        textContentTemplate = Helper().GetTemplate("text-content.tpl", self.templatesPath)
 
         # Generate base navigation
         substitutions=dict()
@@ -270,7 +282,7 @@ class StaticGenerator :
         
         # Check for special page token (currently supported: CONTACT_FORM)
         if contentDictionary["header"] == "CONTACT_FORM" :
-            formContactTemplate = self.GetTemplate("form-contact.tpl")
+            formContactTemplate = Helper().GetTemplate("form-contact.tpl", self.templatesPath)
             substitutions["content_text"]=formContactTemplate.render()
         # Default case
         else : 
@@ -290,17 +302,121 @@ class StaticGenerator :
 class FileManager:
     '''Manage the file system for StaticGenerator.'''
 
-    def __init__(self, sourceBasePath, templateBasePath, temporaryBasePath, outputBasePath) :
-        self.sourceBasePath = sourceBasePath
-        self.templateBasePath = templateBasePath
-        self.temporaryBasePath = temporaryBasePath
-        self.outputBasePath = outputBasePath
+    resourceTree=dict()
 
+    def __init__(self, config) :
+        self.sourceBasePath = config["source_path"]
+        self.templateBasePath = config["templates_path"]
+        self.temporaryBasePath = config["temporary_path"]
+        self.targetPath = config["target_path"]
+        self.forceRemove = config["force_remove"]
+        self.imageFileExtensions = config["image_file_extensions"]
 
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Utilities
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def GetUniqueName(self, uniqueString) :
         m=hashlib.sha1()
         m.update(uniqueString)
         return m.hexdigest()
+
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Image related
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def ProcessImages(self) :
+        '''
+            Process images from the source directory and place the resulting images 
+            in the temporary directory.
+        '''
+        log.debug("FileManager.ProcessImages(0)")
+        
+        for directory in self.resourceTree :
+            if self.resourceTree[directory].count("picture-content.txt")>0 :
+                for image in self.resourceTree[directory]:
+                        if self.imageFileExtensions.count(os.path.splitext(image)[1]) > 0 :
+                            prettyImageName = Helper().PrettifiedFileName(image)
+                            log.info("Processing "+self.sourceBasePath+directory+prettyImageName)
+                            self.CreateThumbnail(self.temporaryBasePath+"tmp_images/"+prettyImageName,self.temporaryBasePath+"img/thumb/"+prettyImageName)
+                            self.ResizeForWeb(self.temporaryBasePath+"tmp_images/"+prettyImageName,self.temporaryBasePath+"img/work/"+prettyImageName)
+
+        shutil.rmtree(self.temporaryBasePath+"tmp_images/",ignore_errors=True)
+
+    def CreateThumbnail(self,originalPath,targetPath) :
+        '''
+        '''
+        log.debug("FileManager.CreateThumbnail(2) with originalPath="+originalPath+", targetPath="+targetPath)
+
+        os.system("convert -resize 250x "+originalPath+" "+targetPath)
+
+    def ResizeForWeb(self,originalPath,targetPath) :
+        '''
+        '''
+        log.debug("FileManager.ResizeForWeb(2) with originalPath="+originalPath+", targetPath="+targetPath)
+        
+        os.system("convert -resize x750 "+originalPath+" "+targetPath)
+
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Files related
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def UpdateResourceList(self) :
+        '''
+            Update directory tree and prepare directories / move files.
+        '''
+        log.debug("FileManager.UpdateResourceList(0)")
+        self.resourceTree = Helper().BuildTree(self.sourceBasePath,self.sourceBasePath)
+
+    def SetupTemporaryDirectory(self) :
+        '''
+            Create subdirectories and move constant files to the temporary directory.
+        '''
+        log.debug("FileManager.SetupTemporaryDirectory(0)")
+
+        # Copy basic apps/css/img
+        shutil.copytree(self.templateBasePath+"js",self.temporaryBasePath+"js")
+        shutil.copytree(self.templateBasePath+"css",self.temporaryBasePath+"css")
+        shutil.copytree(self.templateBasePath+"img",self.temporaryBasePath+"img")
+
+        # Setup tmp image directory
+        self.MakeDir(self.temporaryBasePath+"tmp_images/")
+        
+        # Sanity check
+        if self.resourceTree.get("/").count("meta-content.txt") == 0 :
+            raise Exception("Missing meta-content.txt")
+
+        # Copy custom share / background image
+        metaContent = Helper().ReadYaml(self.sourceBasePath+"meta-content.txt")
+        share_image = metaContent[0]["share_image"]
+        background_image = metaContent[0]["background_image"]
+        shutil.copy(self.sourceBasePath+share_image, self.temporaryBasePath+"img/"+Helper().PrettifiedFileName(share_image))
+        shutil.copy(self.sourceBasePath+background_image, self.temporaryBasePath+"img/"+Helper().PrettifiedFileName(background_image))
+
+        try :
+            globalCssTemplate =  Helper().GetTemplate("global.tpl",self.templateBasePath)
+            f = open(self.temporaryBasePath+"css/global.css","w")
+            backgroundPath = Helper().ReadYaml(self.sourceBasePath+"meta-content.txt")[0]["background_image"]
+            f.write(globalCssTemplate.render({"background_image":Helper().PrettifiedFileName(backgroundPath)}).encode('utf8'))
+            f.close()
+        except :
+            raise Exception("Encountered error while templating global.css.")
+        
+
+    def PrettifyFileNames(self) :
+        '''
+            Remove funky character from file names.
+        '''
+        log.debug("FileManager.PrettifyFileNames(0)")
+
+        for directory in self.resourceTree :
+            if self.resourceTree[directory].count("picture-content.txt")>0 :
+                for image in self.resourceTree[directory]:
+                        if self.imageFileExtensions.count(os.path.splitext(image)[1]) > 0 :
+                            shutil.copy(self.sourceBasePath+directory+image, self.temporaryBasePath+"tmp_images/"+image)
+                            shutil.move(self.temporaryBasePath+"tmp_images/"+image, self.temporaryBasePath+"tmp_images/"+Helper().PrettifiedFileName(image))
+            if self.resourceTree[directory].count("text-content.txt")>0 :
+                for image in self.resourceTree[directory]:
+                        if self.imageFileExtensions.count(os.path.splitext(image)[1]) > 0 :
+                            shutil.copy(self.sourceBasePath+directory+image, self.temporaryBasePath+"img/"+image)
+                            shutil.move(self.temporaryBasePath+"img/"+image, self.temporaryBasePath+"img/"+Helper().PrettifiedFileName(image))
 
     def Encode(self, fileName) :
         uniqueTemporaryName = self.GetUniqueName(fileName)
@@ -308,30 +424,74 @@ class FileManager:
         os.system("mv "+uniqueTemporaryName+" "+fileName)
         os.system("rm "+uniqueTemporaryName)
 
-    def ResizeForThumbnails(self,originalPath,finalPath) :
-        os.system("convert -resize 250x "+originalPath+" "+finalPath)
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # Directory related
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def Probe(self) :
+        '''
+            Probe all necessary directories.
+        '''
+        log.debug("FileManager.Probe(0)")
+        try :
+            self.ProbeOutputDirectory()
+            self.ProbeTemporaryDirectory()
+            self.ProbeTemplateDirectory()
+        except :
+            raise 
 
-    def ResizeForWeb(self,originalPath,finalPath) :
-        os.system("convert -resize x750 "+originalPath+" "+finalPath)
-        
+    def ProbeOutputDirectory(self) :
+        '''
+            Probe the output directory for write access (if exists, etc.).
+        '''
+        log.debug("FileManager.ProbeOutputDirectory(0)")
 
-    def CleanOutputDirectory(self) :
-        logging.info("Removing tree "+self.statGen.outputPath)
-        shutil.rmtree(self.statGen.outputPath,ignore_errors=True)
+        if os.access(self.targetPath,os.F_OK) :
+            if not os.access(self.targetPath,os.W_OK) :
+                raise Exception("Output directory is not writable.")
+        else:
+            raise Exception("Output directory does not exists.")
 
-    def SetupOutputDirectory(self) :
-        logging.info("Copying js to "+self.statGen.outputPath+"js")
-        shutil.copytree("js",self.statGen.outputPath+"js")
-        logging.info("Copying css to "+self.statGen.outputPath+"css")
-        shutil.copytree("css",self.statGen.outputPath+"css")
-        logging.info("Copying img to "+self.statGen.outputPath+"img")
-        shutil.copytree("img",self.statGen.outputPath+"img")
-        logging.info("Creating "+self.statGen.outputPath+"img/work/")
-        try : os.mkdir(self.statGen.outputPath+"img/work/")
-        except OSError: pass
-        logging.info("Creating "+self.statGen.outputPath+"img/thumb/")
-        try : os.mkdir(self.statGen.outputPath+"img/thumb/")
-        except OSError: pass
+    def ProbeTemporaryDirectory(self) :
+        '''
+            Probe the temporary output directory for write access (if exists, etc.).
+        '''
+        log.debug("FileManager.ProbeTemporaryDirectory(0)")
+        if os.access(self.temporaryBasePath,os.F_OK) :
+            raise Exception("Temporary output directory already exists.")
+
+    def ProbeTemplateDirectory(self) :
+        '''
+            Probe the template directory for read access (if exists, etc.).
+        '''
+        log.debug("FileManager.ProbeTemplateDirectory(0)")
+        if os.access(self.templateBasePath,os.F_OK) :
+            if not os.access(self.templateBasePath,os.R_OK) :
+                raise Exception("Template directory is not readable.")
+        else:
+            raise Exception("Template directory does not exists.")
+
+
+    def MakeDir(self,path) :
+        '''
+            Make a directory with proper permissions.
+        '''
+        log.debug("FileManager.MakeDir(1) with path="+path)
+
+        os.mkdir(path,0755)
+        log.info("Created "+path)
+
+    def DeleteDir(self,path) :
+        '''
+            Delete a directory and pass the error.
+        '''
+        log.debug("FileManager.DeleteDir(1) with path="+path)
+        if self.forceRemove :
+            shutil.rmtree(path,ignore_errors=True)
+        else :
+            try :
+                os.rmdir(path)
+            except :
+                raise
 
     # def SourceValidate(self) :
         # Validate the source directory sanity (UTF 8, depth)
