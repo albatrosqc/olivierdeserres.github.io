@@ -1,7 +1,7 @@
-var $container = document.querySelector('.works');
+var $container = $('.works');
 var $works = $('.work');
 
-var pckry = new Packery($container, {
+$container.packery({
   // options
   itemSelector: '.work',
   gutter:'.gutter-sizer',
@@ -9,7 +9,7 @@ var pckry = new Packery($container, {
 });
 
 imagesLoaded($container, function(ev) {
-	pckry.layout();
+	$container.packery('layout');
 });
 
 $works.find('a[rel=work]').fancybox({
@@ -17,19 +17,47 @@ $works.find('a[rel=work]').fancybox({
 	arrows:true
 });
 
-window.onhashchange = function(ev) {
-	var category = window.location.hash.replace(/#/, '');
+$('.nav-works a').click(function(ev) {
+	var $link = $(this);
 	
-	if (category) {
+	$link.closest('.nav-works').find('a').removeClass('active');
+	$link.addClass('active');
+	
+	ev.preventDefault();
+	
+	var $selectors = $('.nav-works a.active');
+	var params = {};
+	
+	$selectors.each(function() {
+		params[$(this).closest('.nav-works').data('type')] = $(this).attr('href').replace(/#/, '');
+	});
+	
+	// TODO : disable links when no results
+	
+	window.location.hash = $.param(params);
+});
+
+window.onhashchange = function(ev) {
+	var params = $.deparam(window.location.hash.replace(/#/, ''));
+	
+	var filters = [];
+	
+	$.each(params, function(key, value) {
+		$('.nav-works[data-type="' + key + '"] a').removeClass('active').filter('[href="#'  + value + '"]').addClass('active');
+		
+		if (value) {
+			filters.push('[data-' + key +'*="' + value + '"]');
+		}
+	});
+	
+	if (filters.length) {
 		$works.hide();
-		$works.filter('[data-category*="' + category + '"]').show();
+		$works.filter(filters.join('')).show();
 	} else {
 		$works.show();
 	}
 	
-	pckry.layout();
-	
-	$('.nav-works a').removeClass('active').filter('[href="#'  + category + '"]').addClass('active');
+	$container.packery('layout');
 };
 
 window.onhashchange();
