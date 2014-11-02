@@ -1,3 +1,4 @@
 pyyaml
 watchdog
 jinja2
+pil
