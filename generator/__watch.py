@@ -5,20 +5,6 @@ from staticgenerator import *
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-
-# Dependencies of the project
-#  OS/binaries:
-#   - Linux is recommended
-#   - imagemagick suite (convert for thumbnails / websized images, identify to fetch info)
-#   - file (to extract charset mimetype)
-#   - iconv (conversion between charsets)
-# 
-#  Python:
-#   - PyYaml
-#   - watchdog
-#   - jinja2
-
-
 def Now() :
     return datetime.datetime.now().strftime("[%d-%m-%Y %H:%M:%S] ")
 
@@ -98,12 +84,8 @@ class EventHandler(FileSystemEventHandler) :
                 self.generate_action()
             elif str(exc)=="Missing meta-content.txt":
                 print Now()+str(exc)
-            elif str(exc)=="Encountered error while templating global.css." :
-                print Now()+str(exc)
             else :
                 print Now()+"Unexpected error:", sys.exc_info()[0]
-
-
 
 def main(argv=None):
 

@@ -1,6 +1,8 @@
 #!/usr/bin/python
+from __future__ import division
 import jinja2
 import yaml
+import Image
 import hashlib, os, shutil, logging
 import pprint as pp
 
@@ -346,14 +348,22 @@ class FileManager:
         '''
         log.debug("FileManager.CreateThumbnail(2) with originalPath="+originalPath+", targetPath="+targetPath)
 
-        os.system("convert -resize 250x "+originalPath+" "+targetPath)
+        im = Image.open(originalPath)
+        width, height = im.size
+        output = im.resize( (250, int(height*250/width)), Image.ANTIALIAS)
+        output.save(targetPath)
 
     def ResizeForWeb(self,originalPath,targetPath) :
         '''
         '''
         log.debug("FileManager.ResizeForWeb(2) with originalPath="+originalPath+", targetPath="+targetPath)
-        
-        os.system("convert -resize x750 "+originalPath+" "+targetPath)
+
+        im = Image.open(originalPath)
+        width, height = im.size
+        output = im.resize( (int(width*750/height), 750), Image.ANTIALIAS)
+        output.save(targetPath)
+
+
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Files related
