@@ -1,4 +1,4 @@
 pyyaml
 watchdog
 jinja2
-pil
+pillow
