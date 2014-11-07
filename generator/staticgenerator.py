@@ -14,6 +14,21 @@ logging.basicConfig(filename='generator.log', level=logging.DEBUG,
                     datefmt='%d-%m-%y %H:%M:%S')
 log = logging.getLogger("staticgenerator")
 
+# Exceptions
+class ProbingError(Exception):
+    ''' Fatal probing error that should stop the process. '''
+    pass
+
+
+class ProbingErrorRestart(Exception):
+    ''' Fatal probing error that should stop the process. '''
+    pass
+
+
+class MissingCrucial(Exception):
+    ''' Missing crucial element (e.g. YAML file). '''
+    pass
+
 
 class Helper:
     '''
@@ -26,11 +41,11 @@ class Helper:
 
     def __init__(self):
         ''' Empty constructor; useful for direct usage within other classes'''
-        log.debug("Helper.__init__(0)")
+        log.debug("Helper.__init__[0]")
 
     def BuildTree(self, filePath, absoluteBase):
         '''Build the directory tree recursively from 'filePath'.'''
-        log.debug("Helper.BuildTree(1) with filePath=" + filePath)
+        log.debug("Helper.BuildTree[1] with filePath=" + filePath)
 
         contentList = os.listdir(filePath,)
         fileList = []
@@ -43,17 +58,17 @@ class Helper:
         self.tree[filePath[len(absoluteBase):] + "/"] = fileList
         return self.tree
 
-    def isYaml(self, filePath):
+    def isYaml(self,filePath):
         '''
             Override the default exception behavior of yaml.load(1) to turn
             it into a simple test of validity.
         '''
-        log.debug("Helper.isYaml(1) with filePath=" + filePath)
+        log.debug("Helper.isYaml[1] with filePath=" + filePath)
 
         try:
             yaml.load(open(filePath, "r").read())
             return True
-        except yaml.YAMLError:
+        except:
             return False
 
     def ReadYaml(self, filePath):
@@ -62,7 +77,7 @@ class Helper:
             (as a dictionary), and its contentType (name without the
             extension).
         '''
-        log.debug("Helper.ReadYaml(1) with filePath=" + filePath)
+        log.debug("Helper.ReadYaml[1] with filePath=" + filePath)
 
         directory, fileName = os.path.split(filePath)
         contentType, extension = os.path.splitext(fileName)
@@ -85,7 +100,7 @@ class Helper:
             A directory that holds the content of the index is associated to
             'index.html' automatically.
         '''
-        log.debug("Helper.URLFromDirectory(2) with directory=" +
+        log.debug("Helper.URLFromDirectory[2] with directory=" +
                   directory + ", index=" + index)
 
         if (directory == index):
@@ -99,13 +114,13 @@ class Helper:
             and a prettified file name (lowercase, underscore for whitespace).
             Unified use of this functions enforce a unified naming scheme.
         '''
-        log.debug("Helper.PrettifiedFileName(1) with filename=" + filename)
+        log.debug("Helper.PrettifiedFileName[1] with filename=" + filename)
 
         return filename.lower().replace(" ", "_")
 
     def GetTemplate(self, templateName, templatePath):
         '''Fetch a template from a path relative to the generator.'''
-        log.debug("Helper.GetTemplate(2) with templateName=" +
+        log.debug("Helper.GetTemplate[2] with templateName=" +
                   templateName + ", templatesPath=" + templatePath)
 
         templateLoader = jinja2.FileSystemLoader(searchpath=templatePath)
@@ -132,7 +147,7 @@ class StaticGenerator:
             Initializes the StaticGenerator object with the absolute path to
             the website source folder, and output directory.
         '''
-        log.debug("StaticGenerator.__init__(3) with sourcePath=" +
+        log.debug("StaticGenerator.__init__[3] with sourcePath=" +
                   sourcePath + ", outputPath=" + outputPath +
                   ", templatesPath=" + templatesPath)
 
@@ -167,11 +182,10 @@ class StaticGenerator:
 
         # Sections are defined by the meta-content
         self.sections = self.meta["page_order"]
-        print(self.sections)
         # Log mismatch between directories and page_order
         directorySections = list()
         for directory in self.tree:
-            strippedName = directory.rstrip("/")
+            strippedName = directory.rstrip("/") 
             if strippedName != "":
                 directorySections.append(strippedName)
         for directory in directorySections:
@@ -196,7 +210,7 @@ class StaticGenerator:
             Render a HTML page using a substitution dictionary and a template.
             Save the output to the output path.
         '''
-        log.debug("StaticGenerator.RenderTemplate(3) with pageTemplate=" +
+        log.debug("StaticGenerator.RenderTemplate[3] with pageTemplate=" +
                   pageTemplate.name + ", substitutions=[see next line], url=" +
                   url)
         log.debug(pp.pformat(substitutions))
@@ -212,11 +226,12 @@ class StaticGenerator:
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def GenerateWebsite(self):
         '''Trigger complete website generation.'''
-        log.debug("StaticGenerator.GenerateWebsite(0)")
+        log.debug("StaticGenerator.GenerateWebsite[0]")
 
         for directory in self.tree:
             for f in self.tree[directory]:
                 path = self.sourcePath + directory + f
+                print(path)
                 if Helper().isYaml(path):
                     content, contentType = Helper().ReadYaml(path)
                     if (contentType == "picture-content"):
@@ -233,14 +248,14 @@ class StaticGenerator:
             Accounts for the calling location through 'name': this page will
             be defined as 'active' in the header navigation links.
         '''
-        log.debug("StaticGenerator.GenerateHeaderNav(1) with name=" + name)
+        log.debug("StaticGenerator.GenerateHeaderNav[1] with name=" + name)
 
         headerNavTemplate = Helper().GetTemplate("nav-header-element.tpl",
                                                  self.templatesPath)
         substitutions = list()
         for section in self.sections:
             templateVariables = dict()
-            if section == name.decode(encoding='UTF-8'):
+            if section == name:
                 templateVariables["active"] = True
             templateVariables["page_url"] =\
                 Helper().URLFromDirectory(section, self.meta["landing_page"])
@@ -252,7 +267,7 @@ class StaticGenerator:
         '''
             Generate a picture page (HTML render included).
         '''
-        log.debug("StaticGenerator.GeneratePicturePage(2) with directory=" +
+        log.debug("StaticGenerator.GeneratePicturePage[2] with directory=" +
                   directory + ", contentDictionary=")
         log.debug(pp.pformat(contentDictionary))
 
@@ -315,18 +330,21 @@ class StaticGenerator:
         '''
             Generate a text page (HTML render included).
         '''
-        log.debug("StaticGenerator.GenerateTextPage(2) with directory=" + directory + ", contentDictionary=")
+        log.debug("StaticGenerator.GenerateTextPage[2] with directory=" + directory + ", contentDictionary=")
         log.debug(pp.pformat(contentDictionary))
 
         # fetch templates
-        pageTemplate = Helper().GetTemplate("text-page.tpl", self.templatesPath)
-        textImageTemplate = Helper().GetTemplate("text-image.tpl", self.templatesPath)
-        textContentTemplate = Helper().GetTemplate("text-content.tpl", self.templatesPath)
+        pageTemplate = Helper().GetTemplate("text-page.tpl",
+                                            self.templatesPath)
+        textImageTemplate = Helper().GetTemplate("text-image.tpl",
+                                                 self.templatesPath)
+        textContentTemplate = Helper().GetTemplate("text-content.tpl",
+                                                   self.templatesPath)
 
         # Generate base navigation
         substitutions=dict()
         substitutions["headerNav"] = self.GenerateHeaderNav(directory)
-        
+
         # Check for special page token (currently supported: CONTACT_FORM)
         if contentDictionary["header"] == "CONTACT_FORM":
             formContactTemplate = Helper().GetTemplate("form-contact.tpl", self.templatesPath)
@@ -375,7 +393,7 @@ class FileManager:
             Process images from the source directory and place the resulting images 
             in the temporary directory.
         '''
-        log.debug("FileManager.ProcessImages(0)")
+        log.debug("FileManager.ProcessImages[0]")
         
         for directory in self.resourceTree:
             if self.resourceTree[directory].count("picture-content.txt")>0:
@@ -391,7 +409,7 @@ class FileManager:
     def CreateThumbnail(self,originalPath,targetPath):
         '''
         '''
-        log.debug("FileManager.CreateThumbnail(2) with originalPath="+originalPath+", targetPath="+targetPath)
+        log.debug("FileManager.CreateThumbnail[2] with originalPath="+originalPath+", targetPath="+targetPath)
 
         im = Image.open(originalPath)
         width, height = im.size
@@ -401,7 +419,7 @@ class FileManager:
     def ResizeForWeb(self,originalPath,targetPath):
         '''
         '''
-        log.debug("FileManager.ResizeForWeb(2) with originalPath="+originalPath+", targetPath="+targetPath)
+        log.debug("FileManager.ResizeForWeb[2] with originalPath="+originalPath+", targetPath="+targetPath)
 
         im = Image.open(originalPath)
         width, height = im.size
@@ -417,14 +435,14 @@ class FileManager:
         '''
             Update directory tree and prepare directories / move files.
         '''
-        log.debug("FileManager.UpdateResourceList(0)")
+        log.debug("FileManager.UpdateResourceList[0]")
         self.resourceTree = Helper().BuildTree(self.sourceBasePath,self.sourceBasePath)
 
     def SetupTemporaryDirectory(self):
         '''
             Create subdirectories and move constant files to the temporary directory.
         '''
-        log.debug("FileManager.SetupTemporaryDirectory(0)")
+        log.debug("FileManager.SetupTemporaryDirectory[0]")
 
         # Copy basic apps/css/img
         shutil.copytree(self.templateBasePath+"js",self.temporaryBasePath+"js")
@@ -459,7 +477,7 @@ class FileManager:
         '''
             Remove funky character from file names.
         '''
-        log.debug("FileManager.PrettifyFileNames(0)")
+        log.debug("FileManager.PrettifyFileNames[0]")
 
         for directory in self.resourceTree:
             if self.resourceTree[directory].count("picture-content.txt")>0:
@@ -486,7 +504,7 @@ class FileManager:
         '''
             Probe all necessary directories.
         '''
-        log.debug("FileManager.Probe(0)")
+        log.debug("FileManager.Probe[0]")
         try:
             self.ProbeOutputDirectory()
             self.ProbeTemporaryDirectory()
@@ -496,41 +514,41 @@ class FileManager:
 
     def ProbeOutputDirectory(self):
         '''
-            Probe the output directory for write access (if exists, etc.).
+            Probe the output directory for write access.
         '''
-        log.debug("FileManager.ProbeOutputDirectory(0)")
+        log.debug("FileManager.ProbeOutputDirectory[0]")
 
         if os.access(self.targetPath,os.F_OK):
             if not os.access(self.targetPath,os.W_OK):
-                raise Exception("Output directory is not writable.")
+                raise ProbingError("Output directory is not writeable.")
         else:
-            raise Exception("Output directory does not exists.")
+            raise ProbingError("Output directory does not exists.")
 
     def ProbeTemporaryDirectory(self):
         '''
-            Probe the temporary output directory for write access (if exists, etc.).
+            Probe the temporary output directory for write access/existence.
         '''
-        log.debug("FileManager.ProbeTemporaryDirectory(0)")
+        log.debug("FileManager.ProbeTemporaryDirectory[0]")
         if os.access(self.temporaryBasePath,os.F_OK):
-            raise Exception("Temporary output directory already exists.")
+            raise ProbingErrorRestart("Temporary directory already exists.")
 
     def ProbeTemplateDirectory(self):
         '''
-            Probe the template directory for read access (if exists, etc.).
+            Probe the template directory for read access.
         '''
-        log.debug("FileManager.ProbeTemplateDirectory(0)")
+        log.debug("FileManager.ProbeTemplateDirectory[0]")
         if os.access(self.templateBasePath,os.F_OK):
             if not os.access(self.templateBasePath,os.R_OK):
-                raise Exception("Template directory is not readable.")
+                raise MissingCrucial("Template directory is not readable.")
         else:
-            raise Exception("Template directory does not exists.")
+            raise MissingCrucial("Template directory does not exists.")
 
 
     def MakeDir(self,path):
         '''
             Make a directory with proper permissions.
         '''
-        log.debug("FileManager.MakeDir(1) with path="+path)
+        log.debug("FileManager.MakeDir[1] with path="+path)
 
         os.mkdir(path,0o755)
         log.info("Created "+path)
@@ -539,7 +557,7 @@ class FileManager:
         '''
             Delete a directory and pass the error.
         '''
-        log.debug("FileManager.DeleteDir(1) with path="+path)
+        log.debug("FileManager.DeleteDir[1] with path="+path)
         if self.forceRemove:
             shutil.rmtree(path,ignore_errors=True)
         else:
