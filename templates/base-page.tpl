@@ -30,6 +30,7 @@
         <link href="http://fonts.googleapis.com/css?family=Oswald:400,300|Armata" rel="stylesheet" type="text/css">
         <link href="css/jquery.fancybox.css" media="all" rel="stylesheet" type="text/css">
         <link href="css/global.css" media="all" rel="stylesheet" type="text/css">
+        <link href="css/custom.css" media="all" rel="stylesheet" type="text/css">
     </head>
     <body>
         <div class="wrapper">

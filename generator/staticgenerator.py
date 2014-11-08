@@ -470,13 +470,13 @@ class FileManager:
         shutil.copy(self.sourceBasePath+background_image, self.temporaryBasePath+"img/"+Helper().PrettifiedFileName(background_image))
 
         try:
-            globalCssTemplate =  Helper().GetTemplate("global.tpl",self.templateBasePath)
-            f = open(self.temporaryBasePath+"css/global.css","w")
+            customCssTemplate =  Helper().GetTemplate("custom.tpl",self.templateBasePath)
+            f = open(self.temporaryBasePath+"css/custom.css","w")
             backgroundPath = Helper().ReadYaml(self.sourceBasePath+"meta-content.txt")[0]["background_image"]
-            f.write(globalCssTemplate.render({"background_image":Helper().PrettifiedFileName(backgroundPath)}))
+            f.write(customCssTemplate.render({"background_image":Helper().PrettifiedFileName(backgroundPath)}))
             f.close()
         except:
-            raise Exception("Encountered error while templating global.css.")
+            raise Exception("Encountered error while templating custom.css.")
         
 
     def PrettifyFileNames(self):
