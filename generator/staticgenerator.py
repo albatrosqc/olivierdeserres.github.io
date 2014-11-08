@@ -14,6 +14,7 @@ logging.basicConfig(filename='generator.log', level=logging.DEBUG,
                     datefmt='%d-%m-%y %H:%M:%S')
 log = logging.getLogger("staticgenerator")
 
+
 # Exceptions
 class ProbingError(Exception):
     ''' Fatal probing error that should stop the process. '''
@@ -58,7 +59,7 @@ class Helper:
         self.tree[filePath[len(absoluteBase):] + "/"] = fileList
         return self.tree
 
-    def isYaml(self,filePath):
+    def isYaml(self, filePath):
         '''
             Override the default exception behavior of yaml.load(1) to turn
             it into a simple test of validity.
@@ -185,7 +186,7 @@ class StaticGenerator:
         # Log mismatch between directories and page_order
         directorySections = list()
         for directory in self.tree:
-            strippedName = directory.rstrip("/") 
+            strippedName = directory.rstrip("/")
             if strippedName != "":
                 directorySections.append(strippedName)
         for directory in directorySections:
@@ -205,20 +206,22 @@ class StaticGenerator:
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Utilities
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    def RenderTemplate(self, pageTemplate, substitutions, url):
+    def RenderTemplate(self, template, substitutions, url):
         '''
             Render a HTML page using a substitution dictionary and a template.
             Save the output to the output path.
         '''
-        log.debug("StaticGenerator.RenderTemplate[3] with pageTemplate=" +
-                  pageTemplate.name + ", substitutions=[see next line], url=" +
+        log.debug("StaticGenerator.RenderTemplate[3] with template=" +
+                  template.name + ", substitutions=[see next line], url=" +
                   url)
         log.debug(pp.pformat(substitutions))
 
         # Generate html page
-        f = open(self.outputPath + url, "w")
-        f.write(pageTemplate.render(dict(substitutions.items() +
-                self.meta.items())))
+        f = open(self.outputPath + url, 'w')
+        templateVariables = self.meta
+        templateVariables.update(substitutions)
+        print(templateVariables)
+        f.write(template.render(templateVariables))
         f.close()
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -231,8 +234,8 @@ class StaticGenerator:
         for directory in self.tree:
             for f in self.tree[directory]:
                 path = self.sourcePath + directory + f
-                print(path)
                 if Helper().isYaml(path):
+                    print(path)
                     content, contentType = Helper().ReadYaml(path)
                     if (contentType == "picture-content"):
                         self.GeneratePicturePage(directory.rstrip("/"),
@@ -330,7 +333,8 @@ class StaticGenerator:
         '''
             Generate a text page (HTML render included).
         '''
-        log.debug("StaticGenerator.GenerateTextPage[2] with directory=" + directory + ", contentDictionary=")
+        log.debug("StaticGenerator.GenerateTextPage[2] with directory=" +
+                  directory + ", contentDictionary=")
         log.debug(pp.pformat(contentDictionary))
 
         # fetch templates
@@ -342,26 +346,31 @@ class StaticGenerator:
                                                    self.templatesPath)
 
         # Generate base navigation
-        substitutions=dict()
+        substitutions = dict()
         substitutions["headerNav"] = self.GenerateHeaderNav(directory)
 
         # Check for special page token (currently supported: CONTACT_FORM)
         if contentDictionary["header"] == "CONTACT_FORM":
-            formContactTemplate = Helper().GetTemplate("form-contact.tpl", self.templatesPath)
-            substitutions["content_text"]=formContactTemplate.render()
+            formContactTemplate = Helper().GetTemplate("form-contact.tpl",
+                                                       self.templatesPath)
+            substitutions["content_text"] = formContactTemplate.render()
         # Default case
-        else: 
+        else:
             # Fetch text page image
-            substitutions["content_image"] =  textImageTemplate.render({"image_url":contentDictionary["image"]})
+            imgUrl = {"image_url": contentDictionary["image"]}
+            substitutions["content_image"] = textImageTemplate.render(imgUrl)
 
             # Fetch text: render header, then content.
-            text = textContentTemplate.render({"text_content":contentDictionary["header"].split("\n")}) 
+            header = {"text_content": contentDictionary["header"].split("\n")}
+            text = textContentTemplate.render(header)
             for section in contentDictionary["sections"]:
-                templateVariables = {"text_section_title":section["name"], "text_content": section["content"].split("\n") }
-                text = text+textContentTemplate.render(templateVariables)
+                templateVars = {"text_section_title": section["name"],
+                                "text_content": section["content"].split("\n")}
+                text = text+textContentTemplate.render(templateVars)
             substitutions["content_text"] = text
 
-        self.RenderTemplate(pageTemplate,substitutions,Helper().URLFromDirectory(directory,self.meta["landing_page"]))
+        url = Helper().URLFromDirectory(directory,self.meta["landing_page"])
+        self.RenderTemplate(pageTemplate, substitutions, url)
 
 
 class FileManager:
