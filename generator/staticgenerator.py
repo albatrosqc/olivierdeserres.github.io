@@ -220,7 +220,6 @@ class StaticGenerator:
         f = open(self.outputPath + url, 'w')
         templateVariables = self.meta
         templateVariables.update(substitutions)
-        print(templateVariables)
         f.write(template.render(templateVariables))
         f.close()
 
@@ -238,11 +237,9 @@ class StaticGenerator:
                     print(path)
                     content, contentType = Helper().ReadYaml(path)
                     if (contentType == "picture-content"):
-                        self.GeneratePicturePage(directory.rstrip("/"),
-                                                 content)
+                        self.GeneratePicturePage(directory.rstrip("/"), content)
                     if (contentType == "text-content"):
-                        self.GenerateTextPage(directory.rstrip("/"),
-                                              content)
+                        self.GenerateTextPage(directory.rstrip("/"), content)
 
     def GenerateHeaderNav(self, name):
         '''
