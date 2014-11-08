@@ -1,6 +1,6 @@
 {% extends "base-page.tpl" %}
 {% block CONTENT_NAV %}
-            <nav class="nav nav-works">
+            <nav class="nav nav-works"" data-type="categorie">
                 <ul class="cf">
 
                     <li class="nav-title">Catégorie</li>
@@ -11,7 +11,7 @@
                 </ul>
             </nav>
 
-            <nav class="nav nav-works">
+            <nav class="nav nav-works"" data-type="annee">
                 <ul class="cf">
 
                     <li class="nav-title">Année</li>
@@ -35,6 +35,7 @@
 
 {% block EXTRA_SCRIPTS %}
         <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script src="js/jquery-deparam.js"></script>
         <script src="js/packery.pkgd.min.js"></script>
         <script src="js/imagesloaded.pkgd.min.js"></script>
         <script src="js/jquery.fancybox.pack.js"></script>{% endblock %}
