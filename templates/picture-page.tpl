@@ -1,6 +1,6 @@
 {% extends "base-page.tpl" %}
 {% block CONTENT_NAV %}
-            <nav class="nav nav-works"" data-type="categorie">
+            <nav class="nav nav-works" data-type="categorie">
                 <ul class="cf">
 
                     <li class="nav-title">Catégorie</li>
@@ -11,7 +11,7 @@
                 </ul>
             </nav>
 
-            <nav class="nav nav-works"" data-type="annee">
+            <nav class="nav nav-works" data-type="annee">
                 <ul class="cf">
 
                     <li class="nav-title">Année</li>
