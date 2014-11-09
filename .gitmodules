@@ -1,0 +1,3 @@
+[submodule "dropbox-generator"]
+	path = dropbox-generator
+	url = git@github.com:olivierdeserres/dropbox-generator.git
