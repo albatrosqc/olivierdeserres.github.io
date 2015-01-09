@@ -63,7 +63,7 @@ var App = (function() {
 		// Repack all works in a new layout
 		$container.packery('layout');
 		
-		// TODO : reset fancybox with only visible ones
+		// TODO : reset photoswipe with only visible ones
 	};
 	
 	var onWindowResize = function(ev) {
@@ -85,11 +85,7 @@ var App = (function() {
 			$container.packery('layout');
 		});
 		
-		// Setup fancybox for all the works
-		$works.find('a[rel=work]').fancybox({
-			scrolling:'no',
-			arrows:true
-		});
+		// TODO : setup photoswipe
 		
 		// Click event on work navigation
 		$navWorks.find('a').on('click', onNavWorksClick);
