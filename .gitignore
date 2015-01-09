@@ -1,3 +1,6 @@
+# No node modules
+design/node_modules
+
 # Don't commit custom configuration files
 configuration.yml
 olivierdeserres.TODO
