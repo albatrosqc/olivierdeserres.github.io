@@ -4,6 +4,39 @@ var App = (function() {
 	var $works = $('.work');
 	var $navWorks = $('.nav-works');
 	
+	var reindexSlides = function() {
+		$works.filter(':visible').each(function(index) {
+			var $work = $(this);
+			var $trigger = $(this).find('a');
+				$trigger.data('index', index);
+		});
+	};
+	
+	var setupSlides = function() {		
+		$works.find('a').on('click', function(ev) {
+			ev.preventDefault();
+			
+			var items = [];
+			var options =  {
+				index:$(this).data('index')
+			};
+			
+			$works.filter(':visible').each(function(index) {
+				var $trigger = $(this).find('a');
+				
+				items.push({
+					src:$trigger.attr('href'),
+					w:$trigger.data('width') || 500,
+					h:$trigger.data('height') || 500,
+					title:$trigger.attr('title')
+				});
+			});
+			
+			var gallery = new PhotoSwipe(document.querySelectorAll('.pswp')[0], PhotoSwipeUI_Default, items, options);
+				gallery.init();
+		});
+	};
+	
 	// Navigation event
 	
 	var onNavWorksClick = function(ev) {
@@ -63,7 +96,8 @@ var App = (function() {
 		// Repack all works in a new layout
 		$container.packery('layout');
 		
-		// TODO : reset photoswipe with only visible ones
+		// reset photoswipe with only visible ones
+		reindexSlides();
 	};
 	
 	var onWindowResize = function(ev) {
@@ -85,7 +119,9 @@ var App = (function() {
 			$container.packery('layout');
 		});
 		
-		// TODO : setup photoswipe
+		// Setup photoswipe
+		reindexSlides();
+		setupSlides();
 		
 		// Click event on work navigation
 		$navWorks.find('a').on('click', onNavWorksClick);
