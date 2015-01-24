@@ -1,8 +1,8 @@
 var App = (function() {
 	// App variables
-	var $container = $('.works');
-	var $works = $('.work');
-	var $navWorks = $('.nav-works');
+	var $container = null;
+	var $works = null;
+	var $navWorks = null;
 	
 	var reindexSlides = function() {
 		$works.filter(':visible').each(function(index) {
@@ -105,24 +105,32 @@ var App = (function() {
 	};
 	
 	var onPageReady = function(ev) {
-		// Layout all the works using packery
-		$container.packery({
-			itemSelector: '.work', // Item selector
-			gutter:'.gutter-sizer', // Percent-based gutter
-			transitionDuration:'0s' // No transition when resizing
-		});
+		console.log('paage ready');
+		
+		$container = $('.works');
+		$works = $('.work');
+		$navWorks = $('.nav-works');
+		
+		if ($container.length) {
+			// Layout all the works using packery
+			$container.packery({
+				itemSelector: '.work', // Item selector
+				gutter:'.gutter-sizer', // Percent-based gutter
+				transitionDuration:'0s' // No transition when resizing
+			});
 
-		// When all images are loaded, apply new layout to make sure everything looks good
-		imagesLoaded($container, function(ev) {
-			$container.packery('layout');
-		});
+			// When all images are loaded, apply new layout to make sure everything looks good
+			imagesLoaded($container, function(ev) {
+				$container.packery('layout');
+			});
 
-		// Setup photoswipe
-		reindexSlides();
-		setupSlides();
+			// Setup photoswipe
+			reindexSlides();
+			setupSlides();
 
-		// Click event on work navigation
-		$navWorks.find('a').on('click', onNavWorksClick);
+			// Click event on work navigation
+			$navWorks.find('a').on('click', onNavWorksClick);
+		}
 	};
 	
 	// Constructor
