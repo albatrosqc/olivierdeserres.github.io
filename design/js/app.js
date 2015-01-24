@@ -105,8 +105,6 @@ var App = (function() {
 	};
 	
 	var onPageReady = function(ev) {
-		console.log('paage ready');
-		
 		$container = $('.works');
 		$works = $('.work');
 		$navWorks = $('.nav-works');
@@ -139,10 +137,10 @@ var App = (function() {
 		$(document).pjax('a', '.content', {
 			fragment:'.content'
 		});
-		
-		$(document).on('pjax:click', function(options) {
+
+		$('.nav-header a').on('click', function(ev) {
+			$(this).closest('.nav-header').find('a').removeClass('active');
 			$(this).addClass('active');
-			console.log(this)
 		});
 		
 		$(document).on('pjax:complete', onPageReady).trigger('pjax:complete');
