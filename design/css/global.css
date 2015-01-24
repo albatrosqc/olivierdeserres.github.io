@@ -62,6 +62,7 @@ body:after {
 a {
 	color:#DDD;
 	text-decoration:none;
+	outline:none;
 }
 
 a:hover, a.active {
@@ -325,7 +326,6 @@ p {
 		display:block;
 		z-index:2;
 		position:relative;
-		outline:none;
 	}
 	
 	.nav {

@@ -43,6 +43,12 @@ var App = (function() {
 		// Prevent link from firing, hash will be changed further down
 		ev.preventDefault();
 		
+		if ($(this).is('.disabled')) {
+			ev.stopPropagation();
+			ev.stopImmediatePropagation();
+			return true;
+		}
+		
 		var $link = $(this);
 		
 		$('.nav-works a').removeClass('disabled');
@@ -94,6 +100,10 @@ var App = (function() {
 		
 		// Loop through parameters
 		$.each(params, function(key, value) {
+			if ($.inArray(key, ['categorie', 'annee']) === -1) {
+				return true;
+			}
+			
 			// Activate link in navigation
 			$('.nav-works[data-type="' + key + '"] a').removeClass('active').filter('[href="#'  + value + '"]').addClass('active');
 			
