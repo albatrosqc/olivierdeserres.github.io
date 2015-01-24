@@ -45,11 +45,30 @@ var App = (function() {
 		
 		var $link = $(this);
 		
+		$('.nav-works a').removeClass('disabled');
+		
 		// Apply active class on link
 		$link.closest('.nav-works').find('a').removeClass('active');
 		$link.addClass('active');
 		
-		// TODO : disable links when no results
+		$('.nav-works').each(function() {
+			var currentType = $(this).data('type');
+			var currentValue = $(this).find('a.active').attr('href').replace(/#/, '');
+			
+			if (currentValue) {
+				$('.nav-works:not([data-type="' + currentType + '"])').each(function() {
+					var type = $(this).data('type');
+					$(this).find('li:not(.nav-title) a').each(function() {
+						var value = $(this).attr('href').replace(/#/, '');
+						if (value) {
+							if (!$works.filter('[data-'+ currentType +'="'+ currentValue +'"][data-'+ type +'="'+ value +'"]').length) {
+								$(this).addClass('disabled');
+							}
+						}
+					});
+				});
+			}
+		});
 		
 		// Prepare parameters
 		var $selectors = $navWorks.find('a.active');
@@ -139,7 +158,7 @@ var App = (function() {
 		});
 
 		$('.nav-header a').on('click', function(ev) {
-			$(this).closest('.nav-header').find('a').removeClass('active');
+			$(this).closest('.nav-header').removeClass('nav-opened').find('a').removeClass('active');
 			$(this).addClass('active');
 		});
 		

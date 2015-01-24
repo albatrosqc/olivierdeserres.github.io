@@ -68,6 +68,11 @@ a:hover, a.active {
 	text-decoration:underline;
 }
 
+a.disabled {
+	opacity:0.25;
+	cursor:default;
+}
+
 p {
 	margin: 1.12em 0;
 }
@@ -201,9 +206,9 @@ p {
 	white-space: nowrap;
 }
 
-.nav ul li a.active::before,
-.nav ul li a:hover::before,
-.nav ul li a:focus::before {
+.nav ul li a:not(.disabled).active::before,
+.nav ul li a:not(.disabled):hover::before,
+.nav ul li a:not(.disabled):focus::before {
 	max-width: 100%;
 }
 
