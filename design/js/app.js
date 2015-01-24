@@ -104,33 +104,46 @@ var App = (function() {
 		// $container.packery('layout');
 	};
 	
-	// Constructor
-	
-	var construct = (function() {
-		$('.toggle-nav').on('click', function(ev) {
-			ev.preventDefault();
-			
-			$('.nav.nav-header').toggleClass('nav-opened');
-		});
-		
+	var onPageReady = function(ev) {
 		// Layout all the works using packery
 		$container.packery({
 			itemSelector: '.work', // Item selector
 			gutter:'.gutter-sizer', // Percent-based gutter
 			transitionDuration:'0s' // No transition when resizing
 		});
-		
+
 		// When all images are loaded, apply new layout to make sure everything looks good
 		imagesLoaded($container, function(ev) {
 			$container.packery('layout');
 		});
-		
+
 		// Setup photoswipe
 		reindexSlides();
 		setupSlides();
-		
+
 		// Click event on work navigation
 		$navWorks.find('a').on('click', onNavWorksClick);
+	};
+	
+	// Constructor
+	
+	var construct = (function() {
+		$(document).pjax('a', '.content', {
+			fragment:'.content'
+		});
+		
+		$(document).on('pjax:click', function(options) {
+			$(this).addClass('active');
+			console.log(this)
+		});
+		
+		$(document).on('pjax:complete', onPageReady).trigger('pjax:complete');
+		
+		$('.toggle-nav').on('click', function(ev) {
+			ev.preventDefault();
+			
+			$('.nav.nav-header').toggleClass('nav-opened');
+		});
 		
 		// Hash change event
 		$(window).on('hashchange', onHashChange).trigger('hashchange');
