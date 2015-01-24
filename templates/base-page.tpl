@@ -37,6 +37,8 @@
         <div class="wrapper">
             <header class="header cf">
                 <h1 class="title"><a href="index.html">Olivier<span> </span><em>De<span> </span>Serres</em></a></h1>
+
+                <a href="#" class="toggle-nav">&#x2261;</a>
         
                 <nav class="nav nav-header">
                     <ul class="cf">
