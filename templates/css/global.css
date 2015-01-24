@@ -62,10 +62,16 @@ body:after {
 a {
 	color:#DDD;
 	text-decoration:none;
+	outline:none;
 }
 
 a:hover, a.active {
 	text-decoration:underline;
+}
+
+a.disabled {
+	opacity:0.25;
+	cursor:default;
 }
 
 p {
@@ -151,6 +157,16 @@ p {
 	Navigations
 ------------------------------------------------- */
 
+.toggle-nav {
+	font-size:30px;
+	float:right;
+	display:none;
+}
+
+.toggle-nav:hover {
+	text-decoration:none;
+}
+
 .nav.nav-header {
 	float:right;
 	height:100%;
@@ -191,9 +207,9 @@ p {
 	white-space: nowrap;
 }
 
-.nav ul li a.active::before,
-.nav ul li a:hover::before,
-.nav ul li a:focus::before {
+.nav ul li a:not(.disabled).active::before,
+.nav ul li a:not(.disabled):hover::before,
+.nav ul li a:not(.disabled):focus::before {
 	max-width: 100%;
 }
 
@@ -289,4 +305,56 @@ p {
 .form-actions {
 	text-align:right;
 	width:500px;
+}
+
+
+/**----------------------------------------------
+	Mobile display
+------------------------------------------------- */
+
+
+@media (max-width: 601px) {
+	body {
+		background-image:none;
+	}
+	
+	body:after {
+		display:none;
+	}
+	
+	.toggle-nav {
+		display:block;
+		z-index:2;
+		position:relative;
+	}
+	
+	.nav {
+		display:none;
+	}
+
+	.nav.nav-header.nav-opened {
+		display:block;
+	}
+
+	.nav.nav-header {
+		display:none;
+		background:rgba(0,0,0,0.75);
+		border:1px solid rgba(255, 255, 255, 0.15);;
+		padding:0;
+		position:absolute;
+		right:-7px;
+		top:15px;
+		padding:3px 35px 3px 0;
+		height:auto;
+		z-index:1;
+	}
+
+	.nav-header ul li {
+		float:none;
+		display:block;
+	}
+    
+    .work {
+	    width:49%;
+    }
 }

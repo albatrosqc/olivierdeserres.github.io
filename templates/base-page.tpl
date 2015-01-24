@@ -58,9 +58,28 @@
                     {% endblock %}
             </div><!--content-->
         </div><!--wrapper-->
-        
-        {% block EXTRA_SCRIPTS %}
-        {% endblock %}
+
+        <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script src="js/jquery.pjax.js"></script>
+        <script src="js/jquery-deparam.js"></script>
+        <script src="js/packery.pkgd.min.js"></script>
+        <script src="js/imagesloaded.pkgd.min.js"></script>
+        <script src="js/photoswipe.min.js"></script>
+        <script src="js/photoswipe-ui-default.min.js"></script>
         <script src="js/app.js"></script>
+        
+        <script src="https://squaresend.com/squaresend.js"></script>
+        <script>
+            sqs_title = "Contact";
+            sqs_label_subject = "Sujet";
+            sqs_label_message = "Message";
+            sqs_label_name = "Ton nom";
+            sqs_label_email = "Ton courriel";
+            sqs_label_submit = "Envoyer";
+            sqs_placeholder_subject = "Sujet";
+            sqs_placeholder_message = "Message";
+            sqs_placeholder_name = "Nom";
+            sqs_placeholder_email = "Courriel";
+        </script>
     </body>
 </html>

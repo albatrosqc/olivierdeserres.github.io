@@ -90,12 +90,4 @@
 		</div>
 	</div>
 </div>
-
-{% block EXTRA_SCRIPTS %}
-        <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-        <script src="js/jquery-deparam.js"></script>
-        <script src="js/packery.pkgd.min.js"></script>
-        <script src="js/imagesloaded.pkgd.min.js"></script>
-		<script src="js/photoswipe.min.js"></script>
-		<script src="js/photoswipe-ui-default.min.js"></script>{% endblock %}
             
