@@ -151,6 +151,16 @@ p {
 	Navigations
 ------------------------------------------------- */
 
+.toggle-nav {
+	font-size:30px;
+	float:right;
+	display:none;
+}
+
+.toggle-nav:hover {
+	text-decoration:none;
+}
+
 .nav.nav-header {
 	float:right;
 	height:100%;
@@ -289,4 +299,41 @@ p {
 .form-actions {
 	text-align:right;
 	width:500px;
+}
+
+
+
+@media (max-width: 601px) {
+	.toggle-nav {
+		display:block;
+		z-index:2;
+		position:relative;
+		outline:none;
+	}
+	
+	.nav {
+		display:none;
+	}
+
+	.nav.nav-header.nav-opened {
+		display:block;
+	}
+
+	.nav.nav-header {
+		display:none;
+		background:rgba(0,0,0,0.75);
+		border:1px solid rgba(255, 255, 255, 0.15);;
+		padding:0;
+		position:absolute;
+		right:-7px;
+		top:15px;
+		padding:3px 35px 3px 0;
+		height:auto;
+		z-index:1;
+	}
+
+	.nav-header ul li {
+		float:none;
+		display:block;
+	}
 }

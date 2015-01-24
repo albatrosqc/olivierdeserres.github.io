@@ -107,6 +107,12 @@ var App = (function() {
 	// Constructor
 	
 	var construct = (function() {
+		$('.toggle-nav').on('click', function(ev) {
+			ev.preventDefault();
+			
+			$('.nav.nav-header').toggleClass('nav-opened');
+		});
+		
 		// Layout all the works using packery
 		$container.packery({
 			itemSelector: '.work', // Item selector
