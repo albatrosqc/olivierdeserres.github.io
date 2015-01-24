@@ -302,8 +302,20 @@ p {
 }
 
 
+/**----------------------------------------------
+	Mobile display
+------------------------------------------------- */
+
 
 @media (max-width: 601px) {
+	body {
+		background-image:none;
+	}
+	
+	body:after {
+		display:none;
+	}
+	
 	.toggle-nav {
 		display:block;
 		z-index:2;
@@ -336,4 +348,8 @@ p {
 		float:none;
 		display:block;
 	}
+    
+    .work {
+	    width:49%;
+    }
 }
