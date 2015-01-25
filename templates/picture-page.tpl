@@ -1,37 +1,52 @@
 {% extends "base-page.tpl" %}
 {% block CONTENT_NAV %}
-            <nav class="nav nav-works" data-type="categorie">
-                <ul class="cf">
+    <nav class="nav nav-works" data-type="categorie">
+        <ul class="cf">
 
-                    <li class="nav-title">Catégorie</li>
-                    {{ allNav }}
-                    {% for elements in contentNav|sort -%}
-                        {{ elements }}
-                    {% endfor %}
-                </ul>
-            </nav>
+            <li class="nav-title">Catégorie</li>
+            {{ allNav }}
+            {% for elements in contentNav|sort -%}
+                <li>
+                    <a href="#{{ category_url }}" data-hover="{{ category_name }}">
+                        {{ category_name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
 
-            <nav class="nav nav-works" data-type="annee">
-                <ul class="cf">
+    <nav class="nav nav-works" data-type="annee">
+        <ul class="cf">
 
-                    <li class="nav-title">Année</li>
-                    {{ allNav }}
-                    {% for elements in yearNav|sort(reverse=True) -%}
-                    {{ elements }}
-                    {% endfor %}
-                </ul>
-            </nav>
+            <li class="nav-title">Année</li>
+            
+            {{ allNav }}
+            {% for elements in yearNav|sort(reverse=True) -%}
+                <li>
+                    <a href="#{{ category_url }}" data-hover="{{ category_name }}">
+                        {{ category_name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
 {% endblock %}
 {% block CONTENT %}
-                <div class="works">
+    <div class="works">
 
-                    <div class="gutter-sizer"></div>
-                    {% for elements in workList|sort(true,"image_year") %}
-                    {{ elements|indent(19,false) }}
-                    {% endfor %}
-                </div> <!-- works -->{% endblock %}
+        <div class="gutter-sizer"></div>
+                    
+        {% for elements in workList|sort(true,"image_year") %}
 
-
+            <div data-categorie="{{ category_name }}" data-annee="{{ image_year }}" class="work">
+                <a rel="work" data-width="{{ width }}" data-height="{{ height }}" title="{{ image_title }}  :  {{ image_spec }} ({{ image_year }}) " href="{{ image_url }}">
+                    <img src="{{ image_thumbnail_url }}" title ="{{ image_title }} ({{ image_year }})" />
+                </a>
+            </div>
+            
+        {% endfor %}
+    </div> <!-- works -->
+{% endblock %}
 
 <!-- Root element of PhotoSwipe. Must have class pswp. -->
 <div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">

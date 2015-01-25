@@ -1,1 +1,0 @@
-<li><a href="#{{ category_url }}" data-hover="{{ category_name }}">{{ category_name }}</a></li>
