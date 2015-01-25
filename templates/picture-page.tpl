@@ -4,7 +4,8 @@
         <ul class="cf">
 
             <li class="nav-title">Catégorie</li>
-            {{ allNav }}
+            <li><a href="#" class="active" data-hover="Toutes">Toutes</a></li>
+            
             {% for elements in contentNav|sort -%}
                 <li>
                     <a href="#{{ category_url }}" data-hover="{{ category_name }}">
@@ -19,8 +20,8 @@
         <ul class="cf">
 
             <li class="nav-title">Année</li>
+            <li><a href="#" class="active" data-hover="Toutes">Toutes</a></li>
             
-            {{ allNav }}
             {% for elements in yearNav|sort(reverse=True) -%}
                 <li>
                     <a href="#{{ category_url }}" data-hover="{{ category_name }}">
