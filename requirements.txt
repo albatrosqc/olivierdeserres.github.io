@@ -1,4 +1,0 @@
-pyyaml
-watchdog
-jinja2
-Pillow
