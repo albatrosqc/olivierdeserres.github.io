@@ -61,39 +61,80 @@
             
             <div class="content">
                     
-                    
+
 
                     
-    <img src="img/portrait.jpg" style="width:33%; float:left; padding:0 24px 100px 0;" />
-    
-    
-    <h2></h2>
-        
-            <p> Vit et travaille à Québec.</p>
-        
-            <p>______</p>
-        
-            <p>Lives and works in Quebec City.</p>
-        
-            <p></p>
-        
-    
-    <h2>Expositions/Exhibitions</h2>
-        
-            <p> &#39;&#39;Canadian Bacon/Canadian Bacon Stripes back&#39;&#39;, 2014.</p>
-        
-            <p>&#39;&#39;S.A.U.V.A.G.E&#39;&#39;, Espace le Diamant, 2013.</p>
-        
-            <p>&#39;&#39;L&#39;Art à l&#39;acte&#39;&#39; , Exposition des finissants BAC Arts visuels et médiatiques, 2012.</p>
-        
-            <p>&#39;&#39;Olivier De Serres&#39;&#39;, Galerie Morgan Bridge, 2011.</p>
-        
-            <p>&#39;&#39;Sans-titre&#39;&#39;, Galerie Morgan Bridge, 2010 (&#39;&#39;Expo du colonel&#39;&#39; ).</p>
-        
-            <p>&#39;&#39;Fantasme&#39;&#39; par Transistor Desing , Studio P, 2010. </p>
-        
-    
+    <div class="works">
 
+        <div class="gutter-sizer"></div>
+        
+
+            <div data-categorie="" data-annee="2015" class="work">
+                <a rel="work" data-width="646" data-height="1000" title="Mars de la maîtrise 2015  :  Vernissage le 26 mars 17h aux ateliers du roulement à billes, 334 rue St-Hélène  (2015) " href="img/full/marsmaitrise.jpg">
+                    <img src="img/thumb/marsmaitrise.jpg" title ="Mars de la maîtrise 2015 (2015)" />
+                </a>
+            </div>
+            
+        
+    </div> <!-- works -->
+	
+	<!-- Root element of PhotoSwipe. Must have class pswp. -->
+	<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+		<!-- Background of PhotoSwipe. 
+			 It's a separate element, as animating opacity is faster than rgba(). -->
+		<div class="pswp__bg"></div>
+		<!-- Slides wrapper with overflow:hidden. -->
+		<div class="pswp__scroll-wrap">
+			<!-- Container that holds slides. 
+				PhotoSwipe keeps only 3 of them in DOM to save memory.
+				Don't modify these 3 pswp__item elements, data is added later on. -->
+			<div class="pswp__container">
+				<div class="pswp__item"></div>
+				<div class="pswp__item"></div>
+				<div class="pswp__item"></div>
+			</div>
+			
+			<!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+			<div class="pswp__ui pswp__ui--hidden">
+				<div class="pswp__top-bar">
+					<!--  Controls are self-explanatory. Order can be changed. -->
+					<div class="pswp__counter"></div>
+
+					<button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+					<button class="pswp__button pswp__button--share" title="Share"></button>
+
+					<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+					<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+					<!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+					<!-- element will get class pswp__preloader--active when preloader is running -->
+					<div class="pswp__preloader">
+						<div class="pswp__preloader__icn">
+							<div class="pswp__preloader__cut">
+								<div class="pswp__preloader__donut"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+					<div class="pswp__share-tooltip"></div>
+				</div>
+
+				<button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+				</button>
+
+				<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+				</button>
+
+				<div class="pswp__caption">
+					<div class="pswp__caption__center"></div>
+				</div>
+			</div>
+		</div>
+	</div>
 
             </div><!--content-->
         </div><!--wrapper-->
